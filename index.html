@@ -35,10 +35,12 @@ h2{font-size:clamp(20px,4.5vw,28px);margin:0}
 .card{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:16px}
 .big-btn{background:var(--accent);color:var(--accent-ink);border-radius:999px;
   padding:14px 28px;font-size:20px;font-weight:700;min-height:52px;box-shadow:var(--shadow);
-  transition:transform .1s}
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .1s}
 .big-btn:active{transform:scale(.97)}
 .big-btn[disabled]{opacity:.35;cursor:default}
-.ghost{border:2px solid var(--line);border-radius:999px;padding:10px 20px;min-height:46px;font-weight:600}
+.ghost{border:2px solid var(--line);border-radius:999px;padding:10px 20px;min-height:46px;font-weight:600;
+  display:inline-flex;align-items:center;justify-content:center;gap:7px}
+.ui-ic{width:1.25em;height:1.25em;display:inline-block;vertical-align:-.2em;flex:none}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .center{align-items:center;text-align:center;justify-content:center}
 .spacer{flex:1}
@@ -59,14 +61,15 @@ h2{font-size:clamp(20px,4.5vw,28px);margin:0}
 .tie{border:3px dashed var(--line);border-radius:16px;background:var(--chip);font-weight:800;font-size:20px;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transition:.12s;
   writing-mode:vertical-rl;letter-spacing:.2em}
-.tie .ic{writing-mode:horizontal-tb;font-size:28px;letter-spacing:0}
+.tie .ic{writing-mode:horizontal-tb;width:40px;height:40px;display:flex;align-items:center;justify-content:center;letter-spacing:0}
+.tie .ic svg{width:100%;height:100%;display:block}
 @media (hover:hover){ .tie:hover{border-color:var(--accent);border-style:solid} }
 .tie.on{background:var(--chip-on);border-color:var(--accent);border-style:solid}
 @media (orientation:portrait), (max-width:700px){
   .duel{grid-template-columns:1fr;justify-items:center;gap:8px}
   .duel .pick,.duel .tie{width:min(100%, 60vh)}
-  .tie{writing-mode:horizontal-tb;flex-direction:row;min-height:50px;letter-spacing:.1em;font-size:18px}
-  .tie .ic{font-size:22px}
+  .tie{writing-mode:horizontal-tb;flex-direction:row;min-height:52px;letter-spacing:.1em;font-size:18px}
+  .tie .ic{width:32px;height:32px}
 }
 .pick{position:relative;border-radius:16px;overflow:hidden;background:#000;box-shadow:var(--shadow);
   outline:4px solid transparent;transition:transform .12s, outline-color .12s;aspect-ratio:16/9}
@@ -76,8 +79,9 @@ h2{font-size:clamp(20px,4.5vw,28px);margin:0}
 .pick .tag{position:absolute;left:10px;top:10px;background:rgba(0,0,0,.6);color:#fff;border-radius:10px;
   padding:2px 10px;font-weight:800;font-size:15px}
 .zoom{position:absolute;right:8px;bottom:8px;width:46px;height:46px;border-radius:50%;
-  background:rgba(255,255,255,.92);color:#111;font-size:22px;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.94);color:#2b3a4a;display:flex;align-items:center;justify-content:center;
   box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.zoom svg{width:26px;height:26px;display:block}
 .pick.win{outline-color:var(--good);transform:scale(1.02)}
 .pick.win::after{content:"✔";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   font-size:80px;color:#fff;background:rgba(31,157,107,.35);animation:pop .35s ease}
@@ -88,14 +92,15 @@ h2{font-size:clamp(20px,4.5vw,28px);margin:0}
 .kbd{display:inline-block;border:1px solid var(--line);border-bottom-width:3px;border-radius:6px;padding:0 6px;font-size:13px}
 @media (hover:none){ .desk-only{display:none} }
 
-/* 原因／問題圖示 */
-.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
-.chip{background:var(--chip);border-radius:14px;padding:12px 8px;min-height:84px;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:4px;font-weight:600;border:3px solid transparent;transition:.12s}
-.chip span{font-size:30px;line-height:1}
+/* 原因／問題圖示（3×3 手繪插畫圖卡） */
+.chips{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.chip{background:var(--chip);border-radius:16px;padding:10px 6px;min-height:104px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:6px;font-weight:700;font-size:15px;line-height:1.25;text-align:center;
+  border:3px solid transparent;transition:.12s}
+.chip .chip-ic{width:64px;height:64px;object-fit:contain;display:block;flex:none}
 .chip.on{background:var(--chip-on);border-color:var(--accent)}
 .other-txt{width:100%;margin-top:8px;padding:10px 12px;font-size:16px;border-radius:12px;border:2px solid var(--accent);background:var(--card,transparent);color:inherit}
-@media (max-width:600px){ .chips{grid-template-columns:repeat(4,1fr);gap:6px} .chip{min-height:68px;font-size:13px;padding:6px 2px;line-height:1.2} .chip span{font-size:24px} }
+@media (max-width:600px){ .chips{grid-template-columns:repeat(3,1fr);gap:8px} .chip{min-height:92px;font-size:13px;padding:8px 4px;gap:5px} .chip .chip-ic{width:54px;height:54px} }
 .reason-thumb{width:100%;max-width:420px;border-radius:12px;align-self:center;filter:grayscale(.3)}
 
 /* 評分 */
@@ -108,28 +113,34 @@ h2{font-size:clamp(20px,4.5vw,28px);margin:0}
 .step-label small{font-weight:500;color:var(--sub);font-size:14px}
 .split .reason-thumb{max-width:none}
 @media (min-width:900px) and (orientation:landscape){
-  .split{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(300px,1fr);gap:22px;align-items:center}
+  .split{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(320px,1fr);gap:22px;align-items:center}
   .split .rate-img,.split .reason-thumb{width:100%;max-height:calc(100vh - 140px);object-fit:contain}
   .panel{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:16px 18px}
-  .panel .faces{justify-content:space-between}
-  .panel .face{width:58px;height:58px;font-size:30px}
+  .panel .faces{justify-content:space-between;gap:6px}
+  .panel .face{flex:1;height:68px;padding:4px 2px}
+  .panel .face svg{width:38px;height:38px}
   .panel .chips{grid-template-columns:repeat(2,1fr);gap:8px}
-  .panel .chip{flex-direction:row;justify-content:flex-start;min-height:48px;padding:6px 12px;gap:8px;font-size:15px}
-  .panel .chip span{font-size:22px}
+  .panel .chip{flex-direction:row;justify-content:flex-start;text-align:left;min-height:56px;padding:6px 10px;gap:10px;font-size:14px}
+  .panel .chip .chip-ic{width:46px;height:46px}
+  .panel .chip[data-k="other"]{grid-column:1/-1;justify-content:center}
   .panel .big-btn{align-self:stretch}
 }
 .rate-img img{width:100%;height:100%;object-fit:contain;display:block}
-.faces{display:flex;justify-content:center;gap:clamp(6px,2vw,14px)}
-.face{width:clamp(56px,16vw,76px);height:clamp(56px,16vw,76px);border-radius:50%;background:var(--chip);font-size:clamp(30px,8vw,40px);
-  display:flex;align-items:center;justify-content:center;border:3px solid transparent;transition:.12s;flex-direction:column;line-height:1}
-.face small{font-size:12px;font-weight:700;margin-top:2px;color:var(--sub)}
-.face.on{border-color:var(--accent);background:var(--chip-on);transform:scale(1.1)}
+.faces{display:flex;justify-content:center;gap:clamp(6px,2vw,12px)}
+.face{flex:1;max-width:80px;height:clamp(68px,17vw,78px);border-radius:18px;background:var(--chip);padding:6px 4px;
+  display:flex;align-items:center;justify-content:center;border:3px solid transparent;transition:.12s;flex-direction:column;gap:3px;line-height:1}
+.face svg{width:clamp(36px,9.5vw,44px);height:clamp(36px,9.5vw,44px);display:block}
+.face small{font-size:12px;font-weight:700;color:var(--sub);white-space:nowrap}
+.face.on{border-color:var(--accent);background:var(--chip-on);transform:scale(1.06)}
+.face.on small{color:var(--ink)}
 
 /* 基本資料 */
 .q{display:flex;flex-direction:column;gap:8px}
 .q label.t{font-weight:700}
 .opts{display:flex;flex-wrap:wrap;gap:8px}
-.opt{background:var(--chip);border-radius:12px;padding:10px 16px;min-height:46px;font-weight:600;border:3px solid transparent}
+.opt{background:var(--chip);border-radius:14px;padding:10px 16px;min-height:48px;font-weight:600;border:3px solid transparent;
+  display:inline-flex;align-items:center;gap:9px}
+.opt .opt-ic{width:30px;height:30px;display:block;flex:none}
 .opt.on{background:var(--chip-on);border-color:var(--accent)}
 select,textarea{font:inherit;padding:10px 12px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);min-height:46px}
 textarea{width:100%;min-height:90px}
@@ -138,9 +149,10 @@ textarea{width:100%;min-height:90px}
 .demo{position:relative;max-width:760px;width:100%;align-self:center}
 @media (orientation:portrait), (max-width:700px){ .demo{max-width:340px} }
 .demo .pick{cursor:default}
-.pointer{position:absolute;font-size:46px;pointer-events:none;left:50%;top:50%;transition:left .8s ease, top .8s ease, transform .15s;
-  filter:drop-shadow(0 3px 4px rgba(0,0,0,.4));z-index:5}
-.pointer.tap{transform:scale(.8)}
+.pointer{position:absolute;width:54px;height:54px;pointer-events:none;left:50%;top:50%;transition:left .8s ease, top .8s ease, transform .15s;
+  filter:drop-shadow(0 3px 5px rgba(0,0,0,.35));z-index:5}
+.pointer svg{width:100%;height:100%;display:block}
+.pointer.tap{transform:scale(.82)}
 .step-text{min-height:3em;text-align:center;font-weight:700;font-size:clamp(17px,4vw,21px)}
 
 /* 放大 */
@@ -174,19 +186,19 @@ pre{white-space:pre-wrap;word-break:break-all;font-size:12px;max-height:300px;ov
     <p class="sub">2026 公辦政見發表會・手語畫面評比</p>
     <p>兩個畫面，選出<strong>比較容易看清楚手語</strong>的那一個。<br>大約 4 分鐘，不用打字。</p>
     <p class="sub" style="font-size:14px">縣市名稱與人物臉部都已去識別，只評畫面，不評翻譯員的翻譯。</p>
-    <button class="big-btn" data-go="tutorial">開始 ▶</button>
+    <button class="big-btn" data-go="tutorial">開始 <span class="ui-ic" data-ic="play"></span></button>
   </section>
 
   <!-- 1. 動畫教學 -->
   <section class="screen" id="s-tutorial">
     <div class="topbar"><span class="stage">玩法教學</span><span class="spacer"></span>
-      <button class="ghost" id="skipTut">跳過 ⏭</button></div>
+      <button class="ghost" id="skipTut">跳過 <span class="ui-ic" data-ic="skip"></span></button></div>
     <p class="step-text" id="tutText">每一題會出現兩個畫面</p>
     <div class="duel demo" id="demo">
       <div class="pick" id="demoA"><span class="tag">A</span></div>
-      <div class="tie" id="demoTie"><span class="ic">🤝</span>差不多</div>
+      <div class="tie" id="demoTie"><span class="ic" data-ic="balance"></span>差不多</div>
       <div class="pick" id="demoB"><span class="tag">B</span></div>
-      <div class="pointer" id="pointer">👆</div>
+      <div class="pointer" id="pointer" data-ic="pointer"></div>
     </div>
   </section>
 
@@ -203,9 +215,9 @@ pre{white-space:pre-wrap;word-break:break-all;font-size:12px;max-height:300px;ov
     <div class="topbar"><span class="stage">關於你</span><div class="bar"><i style="width:100%"></i></div></div>
     <div class="card q"><label class="t">1. 你的身分</label>
       <div class="opts" data-q="identity">
-        <button class="opt" data-v="聾人">🤟 聾人（主要用手語）</button>
-        <button class="opt" data-v="聽障">👂 聽障（主要用口語）</button>
-        <button class="opt" data-v="聽人">🗣️ 聽人</button></div></div>
+        <button class="opt" data-v="聾人"><span class="opt-ic" data-ic="idDeaf"></span>聾人（主要用手語）</button>
+        <button class="opt" data-v="聽障"><span class="opt-ic" data-ic="idHoh"></span>聽障（主要用口語）</button>
+        <button class="opt" data-v="聽人"><span class="opt-ic" data-ic="idHearing"></span>聽人</button></div></div>
     <div class="card q"><label class="t">2. 性別</label>
       <div class="opts" data-q="gender">
         <button class="opt" data-v="男">男</button><button class="opt" data-v="女">女</button>
@@ -220,7 +232,7 @@ pre{white-space:pre-wrap;word-break:break-all;font-size:12px;max-height:300px;ov
     <div class="card q"><label class="t">5. 你有看過 2026 年的公辦電視政見發表會嗎？</label>
       <div class="opts" data-q="watched">
         <button class="opt" data-v="有">有</button><button class="opt" data-v="沒有">沒有</button></div></div>
-    <div class="row center"><button class="big-btn" id="profileNext" disabled>進入第一關 ▶</button></div>
+    <div class="row center"><button class="big-btn" id="profileNext" disabled>進入第一關 <span class="ui-ic" data-ic="play"></span></button></div>
   </section>
 
   <!-- 4. 關卡開場 -->
@@ -228,7 +240,7 @@ pre{white-space:pre-wrap;word-break:break-all;font-size:12px;max-height:300px;ov
     <p class="sub" id="stageNo">第一關</p>
     <h1 id="stageTitle">畫面對決</h1>
     <p id="stageDesc"></p>
-    <button class="big-btn" id="stageGo">出發 ▶</button>
+    <button class="big-btn" id="stageGo">出發 <span class="ui-ic" data-ic="play"></span></button>
   </section>
 
   <!-- 5. 第一關：二選一 -->
@@ -248,8 +260,8 @@ pre{white-space:pre-wrap;word-break:break-all;font-size:12px;max-height:300px;ov
       <div class="panel">
         <p class="step-label">剛剛<strong>沒被選</strong>的這個畫面，哪裡不好？<small>（可複選）</small></p>
         <div class="chips" id="reasonChips"></div>
-        <div class="row center"><button class="ghost" id="reasonNone">🤷 不知道</button>
-          <button class="big-btn" id="reasonNext" disabled>繼續 ▶</button></div>
+        <div class="row center"><button class="ghost" id="reasonNone"><span class="ui-ic" data-ic="unknown"></span>不知道</button>
+          <button class="big-btn" id="reasonNext" disabled>繼續 <span class="ui-ic" data-ic="play"></span></button></div>
       </div>
     </div>
   </section>
@@ -259,13 +271,13 @@ pre{white-space:pre-wrap;word-break:break-all;font-size:12px;max-height:300px;ov
     <div class="topbar"><span class="stage">第二關 打分數</span><div class="bar"><i id="rateBar"></i></div>
       <span class="count" id="rateCount"></span></div>
     <div class="split">
-      <div class="rate-img"><img id="rateImg" alt="評分的畫面"><button class="zoom" id="rateZoom" aria-label="放大">🔍</button></div>
+      <div class="rate-img"><img id="rateImg" alt="評分的畫面"><button class="zoom" id="rateZoom" aria-label="放大" data-ic="zoom"></button></div>
       <div class="panel">
         <p class="step-label">① 看手語清不清楚？</p>
         <div class="faces" id="faces"></div>
         <p class="step-label">② 有哪些問題？<small>（可複選，沒有就跳過）</small></p>
         <div class="chips" id="rateChips"></div>
-        <button class="big-btn" id="rateNext" disabled>下一張 ▶</button>
+        <button class="big-btn" id="rateNext" disabled>下一張 <span class="ui-ic" data-ic="play"></span></button>
       </div>
     </div>
   </section>
@@ -278,24 +290,24 @@ pre{white-space:pre-wrap;word-break:break-all;font-size:12px;max-height:300px;ov
       <div class="top3" id="myTop"></div></div>
     <div class="card q"><label class="t" for="comment">還有想說的嗎？（可不填）</label>
       <textarea id="comment" placeholder="例如：希望手語框再大一點……"></textarea></div>
-    <div class="row center"><button class="big-btn" id="submitBtn">送出 ✔</button></div>
+    <div class="row center"><button class="big-btn" id="submitBtn">送出 <span class="ui-ic" data-ic="check"></span></button></div>
     <div class="row center" id="afterSubmit" style="display:none">
       <span>✅ 謝謝試玩！操作上有什麼不順、看不懂的地方，請告訴邀請你的人</span></div>
     <details class="card" id="debugBox" hidden><summary>測試用：看記錄下來的資料（JSON）</summary><pre id="json"></pre></details>
-    <div class="row center"><button class="ghost" id="restart">🔄 重來（測試用）</button></div>
+    <div class="row center"><button class="ghost" id="restart"><span class="ui-ic" data-ic="redo"></span>重來（測試用）</button></div>
   </section>
 
   <!-- 已填過 -->
   <section class="screen center" id="s-done">
     <h2>這台裝置已經填過了 🙏</h2>
     <p class="sub">謝謝你的參與！</p>
-    <button class="ghost" id="restart2">🔄 重來（測試用）</button>
+    <button class="ghost" id="restart2"><span class="ui-ic" data-ic="redo"></span>重來（測試用）</button>
   </section>
 
   <p class="proto">測試版・你的回答只存在這台裝置，不會上傳</p>
 </div>
 
-<div class="lightbox" id="lightbox"><img id="lbImg" alt="放大的畫面"><p class="lb-tip">📱 手機橫放可以看得更大</p><button class="close" id="lbClose" aria-label="關閉">✕</button></div>
+<div class="lightbox" id="lightbox"><img id="lbImg" alt="放大的畫面"><p class="lb-tip"><span class="ui-ic" data-ic="rotate"></span> 手機橫放可以看得更大</p><button class="close" id="lbClose" aria-label="關閉">✕</button></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -308,11 +320,82 @@ const REASON_EVERY = 3; // 每幾組問一次落選原因
 const N_RATE = 5;       // 第二關評分張數
 const STORE_KEY = 'tslSurvey2026_proto';
 const COUNTIES = ['基隆市','台北市','新北市','桃園市','新竹市','新竹縣','苗栗縣','台中市','彰化縣','南投縣','雲林縣','嘉義市','嘉義縣','台南市','高雄市','屏東縣','宜蘭縣','花蓮縣','台東縣','澎湖縣','金門縣','連江縣','住國外／其他'];
-const ISSUES = [ // 第一關原因、第二關問題共用同一組，方便分析
-  ['small','📏','手語框太小／太窄'], ['cover','🚫','被字幕／計時器擋住'], ['dist','↔️','人太遠／太近'],
-  ['dark','💡','太暗'], ['messy','🎨','背景太亂'], ['contrast','🖐️','手和衣服／背景顏色太像'],
-  ['shape','🔲','框的形狀不好'], ['blur','🌫️','畫面模糊'], ['other','❓','其他']];
-const FACES = [['😣','很差'],['🙁','不好'],['😐','普通'],['🙂','不錯'],['😄','很好']];
+const ISSUES = [ // 第一關原因、第二關問題共用同一組，方便分析（圖示放 img/icons/issue-<key>.webp）
+  ['small','手語框太小／太窄'], ['cover','被字幕／計時器擋住'], ['dist','人太遠／太近'],
+  ['dark','太暗'], ['messy','背景太亂'], ['contrast','手和衣服／背景顏色太像'],
+  ['shape','框的形狀不好'], ['blur','畫面模糊'], ['other','其他']];
+
+/* ---------- 溫暖手繪扁平風介面圖示（SVG） ---------- */
+const UI_ICONS = {
+  balance: `<svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+    <path d="M24 9v28M15 37h18" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/>
+    <path d="M9 17h30" stroke="#e0602b" stroke-width="3.4" stroke-linecap="round"/>
+    <circle cx="24" cy="17" r="3.6" fill="#e0602b" stroke="currentColor" stroke-width="2.2"/>
+    <path d="M12 17l-4.5 10h9L12 17zM36 17l-4.5 10h9L36 17z" fill="#f5c8a4" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/>
+    <path d="M6.5 27c0 3.2 2.4 5.2 5.5 5.2s5.5-2 5.5-5.2h-11zM30.5 27c0 3.2 2.4 5.2 5.5 5.2s5.5-2 5.5-5.2h-11z" fill="#6f96b8" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/>
+  </svg>`,
+  zoom: `<svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+    <circle cx="21" cy="21" r="12" fill="#e4eff7" stroke="#2b3a4a" stroke-width="3.8"/>
+    <path d="M16 21h10M21 16v10" stroke="#e0602b" stroke-width="3.2" stroke-linecap="round"/>
+    <path d="M30.5 30.5l9 9" stroke="#2b3a4a" stroke-width="4.4" stroke-linecap="round"/>
+  </svg>`,
+  play: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M7 5.5l11 6.5-11 6.5V5.5z" fill="currentColor" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+  </svg>`,
+  skip: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M4.5 6l7.5 6-7.5 6V6zM13 6l6.5 6-6.5 6V6z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+  </svg>`,
+  check: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M5 12.5l4.8 4.8L19.5 7" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`,
+  unknown: `<svg viewBox="0 0 36 36" fill="none" aria-hidden="true">
+    <circle cx="18" cy="18" r="14" fill="#ffe3d4" stroke="currentColor" stroke-width="2.6"/>
+    <path d="M14 14.2c0-2.4 1.8-4 4.2-4 2.3 0 4 1.4 4 3.5 0 2.5-3.2 3-3.2 5.3" stroke="#e0602b" stroke-width="2.8" stroke-linecap="round"/>
+    <circle cx="19" cy="24" r="1.8" fill="#e0602b"/>
+  </svg>`,
+  redo: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M19 12a7 7 0 1 1-2.2-5.1" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M19 4.8v4.8h-4.8" stroke="#e0602b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`,
+  rotate: `<svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+    <rect x="4" y="9" width="20" height="14" rx="3.2" fill="#6f96b8" stroke="currentColor" stroke-width="2.2"/>
+    <rect x="7" y="11.5" width="13" height="9" rx="1.4" fill="#ffffff"/>
+    <path d="M23 5.5c3 1 4.5 3.5 4.5 6.5" stroke="#e0602b" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M25 10.5l2.5 2 2-2.5" stroke="#e0602b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`,
+  pointer: `<svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
+    <path d="M25 10c0-3 2.3-5 5-5s5 2 5 5v16h3c2.5 0 4.5 1.8 4.5 4.2v1.8h2.5c2.5 0 4.5 1.8 4.5 4.2v2.8h1.5c2.5 0 4.5 2 4.5 4.5V45c0 8-6.5 14-14.5 14h-6c-6 0-10.5-3.2-13.5-8.5l-6.5-11c-1.5-2.5-.6-5.8 1.8-7.2 2.4-1.3 5.2-.4 6.8 2L25 38V10z" fill="#f5c8a4" stroke="#2b3a4a" stroke-width="3.6" stroke-linejoin="round"/>
+    <path d="M35 26v10M42.5 31v8M49.5 36v6" stroke="#2b3a4a" stroke-width="2.8" stroke-linecap="round"/>
+  </svg>`,
+  idDeaf: `<svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+    <rect x="2" y="2" width="44" height="44" rx="12" fill="#e4eff7"/>
+    <path d="M12 31c-2-5-1-12 3-14 2-1 4 1 5 4l2 5c1 3 0 7-3 8-3 1-6-1-7-3z" fill="#f5c8a4" stroke="#2b3a4a" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M36 27c2-5 1-12-3-14-2-1-4 1-5 4l-2 5c-1 3 0 7 3 8 3 1 6-1 7-3z" fill="#f5c8a4" stroke="#2b3a4a" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M10 14c1-2 3-3 5-3M38 12c-1-2-3-3-5-3" stroke="#e0602b" stroke-width="2.5" stroke-linecap="round"/>
+  </svg>`,
+  idHoh: `<svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+    <rect x="2" y="2" width="44" height="44" rx="12" fill="#f7ebe4"/>
+    <path d="M14 14h20a6 6 0 0 1 6 6v9a6 6 0 0 1-6 6H22l-7 5v-5h-1a6 6 0 0 1-6-6v-9a6 6 0 0 1 6-6z" fill="#ffffff" stroke="#2b3a4a" stroke-width="2.5" stroke-linejoin="round"/>
+    <circle cx="19" cy="24.5" r="2.3" fill="#e0602b"/><circle cx="25" cy="24.5" r="2.3" fill="#e0602b"/><circle cx="31" cy="24.5" r="2.3" fill="#e0602b"/>
+  </svg>`,
+  idHearing: `<svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+    <rect x="2" y="2" width="44" height="44" rx="12" fill="#e6f2ec"/>
+    <circle cx="20" cy="21" r="7" fill="#f5c8a4" stroke="#2b3a4a" stroke-width="2.5"/>
+    <path d="M10 38c0-6 4.5-9 10-9s10 3 10 9" fill="#6f96b8" stroke="#2b3a4a" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M32 17c2.5 2 2.5 6 0 8M36 14c4 3.5 4 10.5 0 14" stroke="#1f9d6b" stroke-width="2.6" stroke-linecap="round"/>
+  </svg>`
+};
+document.querySelectorAll('[data-ic]').forEach(el => { if (UI_ICONS[el.dataset.ic]) el.innerHTML = UI_ICONS[el.dataset.ic]; });
+
+const FACES = [
+  [`<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="19" fill="#f4b6a6" stroke="#2b3a4a" stroke-width="2.8"/><path d="M15 19l5 3-5 3M33 19l-5 3 5 3" stroke="#2b3a4a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 34c2-4 12-4 14 0" stroke="#2b3a4a" stroke-width="2.8" stroke-linecap="round"/></svg>`,'很差'],
+  [`<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="19" fill="#f7cfa8" stroke="#2b3a4a" stroke-width="2.8"/><circle cx="17.5" cy="21" r="2.4" fill="#2b3a4a"/><circle cx="30.5" cy="21" r="2.4" fill="#2b3a4a"/><path d="M18 33c2-2.6 10-2.6 12 0" stroke="#2b3a4a" stroke-width="2.8" stroke-linecap="round"/></svg>`,'不好'],
+  [`<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="19" fill="#f5e3a4" stroke="#2b3a4a" stroke-width="2.8"/><circle cx="17.5" cy="21" r="2.4" fill="#2b3a4a"/><circle cx="30.5" cy="21" r="2.4" fill="#2b3a4a"/><path d="M18 31h12" stroke="#2b3a4a" stroke-width="2.8" stroke-linecap="round"/></svg>`,'普通'],
+  [`<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="19" fill="#cce7c5" stroke="#2b3a4a" stroke-width="2.8"/><circle cx="17.5" cy="21" r="2.4" fill="#2b3a4a"/><circle cx="30.5" cy="21" r="2.4" fill="#2b3a4a"/><path d="M17.5 30c2 3 11 3 13 0" stroke="#2b3a4a" stroke-width="2.8" stroke-linecap="round"/></svg>`,'不錯'],
+  [`<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="19" fill="#9ed8b8" stroke="#2b3a4a" stroke-width="2.8"/><path d="M14.5 21.5c1.5-2.5 4.5-2.5 6 0M27.5 21.5c1.5-2.5 4.5-2.5 6 0" stroke="#2b3a4a" stroke-width="2.6" stroke-linecap="round"/><path d="M16 29c2.5 5 13.5 5 16 0" fill="#ffffff" stroke="#2b3a4a" stroke-width="2.6" stroke-linejoin="round"/></svg>`,'很好']
+];
+// 預先載入 9 張問題插畫圖示，避免切換畫面時閃爍
+ISSUES.forEach(([k]) => { const i = new Image(); i.src = `img/icons/issue-${k}.webp`; });
 
 /* ---------- 小工具 ---------- */
 const $ = s => document.querySelector(s);
@@ -374,18 +457,18 @@ let tutTimer = [];
 function runTutorial(){
   tutTimer.forEach(clearTimeout); tutTimer = [];
   const A = $('#demoA'), B = $('#demoB'), p = $('#pointer'), t = $('#tutText');
-  A.innerHTML = '<span class="tag">A</span>' + fakeFrame(true) + '<span class="zoom">🔍</span>';
-  B.innerHTML = '<span class="tag">B</span>' + fakeFrame(false) + '<span class="zoom">🔍</span>';
+  A.innerHTML = '<span class="tag">A</span>' + fakeFrame(true) + `<span class="zoom">${UI_ICONS.zoom}</span>`;
+  B.innerHTML = '<span class="tag">B</span>' + fakeFrame(false) + `<span class="zoom">${UI_ICONS.zoom}</span>`;
   A.className = B.className = 'pick';
   const at = (el, dx = .5, dy = .5) => { const r = el.getBoundingClientRect(), d = $('#demo').getBoundingClientRect();
-    p.style.left = (r.left - d.left + r.width * dx - 14) + 'px'; p.style.top = (r.top - d.top + r.height * dy - 6) + 'px'; };
+    p.style.left = (r.left - d.left + r.width * dx - 20) + 'px'; p.style.top = (r.top - d.top + r.height * dy - 8) + 'px'; };
   const tap = () => { p.classList.add('tap'); setTimeout(() => p.classList.remove('tap'), 180); };
   const steps = [
     [0,    () => { t.textContent = '每一題會出現兩個畫面'; at($('#demo'), .5, .5); }],
     [1600, () => { t.textContent = '看哪一個比較容易看清楚手語'; at(B); }],
     [3000, () => { at(A); }],
     [4200, () => { t.textContent = '點一下比較好的那一個 👍'; tap(); A.classList.add('win'); B.classList.add('lose'); }],
-    [6200, () => { A.className = B.className = 'pick'; t.textContent = '看不清楚？按 🔍 可以放大'; at(B, .9, .85); }],
+    [6200, () => { A.className = B.className = 'pick'; t.innerHTML = `看不清楚？按 <span class="ui-ic">${UI_ICONS.zoom}</span> 可以放大`; at(B, .9, .85); }],
     [7400, () => { tap(); }],
     [8800, () => { t.textContent = '兩個差不多，就按中間的「差不多」'; at($('#demoTie')); }],
     [10000,() => { tap(); $('#demoTie').classList.add('on'); }],
@@ -402,7 +485,7 @@ function startPractice(){
   const goodLeft = Math.random() < .5;
   const d = $('#practiceDuel');
   const pc = (g, i) => `<button class="pick" data-good="${g}"><span class="tag">${'AB'[i]}</span>${fakeFrame(g)}</button>`;
-  d.innerHTML = pc(goodLeft, 0) + `<button class="tie" id="practiceTie"><span class="ic">🤝</span>差不多</button>` + pc(!goodLeft, 1);
+  d.innerHTML = pc(goodLeft, 0) + `<button class="tie" id="practiceTie"><span class="ic">${UI_ICONS.balance}</span>差不多</button>` + pc(!goodLeft, 1);
   $('#practiceTie').onclick = () => toast('再仔細比比看 👀');
   d.querySelectorAll('.pick').forEach(b => b.onclick = () => {
     if (b.dataset.good === 'true'){
@@ -444,8 +527,8 @@ function renderPair(){
   const card = (c, i) =>
     `<div class="pick" role="button" tabindex="0" data-side="${'LR'[i]}" aria-label="選畫面 ${'AB'[i]}">
        <span class="tag">${'AB'[i]}</span><img src="${img(c)}" alt="畫面 ${'AB'[i]}" draggable="false">
-       <button class="zoom" data-z="${c}" aria-label="放大畫面 ${'AB'[i]}">🔍</button></div>`;
-  $('#duel').innerHTML = card(a, 0) + `<button class="tie" id="tieBtn"><span class="ic">🤝</span>差不多</button>` + card(b, 1);
+       <button class="zoom" data-z="${c}" aria-label="放大畫面 ${'AB'[i]}">${UI_ICONS.zoom}</button></div>`;
+  $('#duel').innerHTML = card(a, 0) + `<button class="tie" id="tieBtn"><span class="ic">${UI_ICONS.balance}</span>差不多</button>` + card(b, 1);
   $('#tieBtn').onclick = () => vote('T');
   $('#duel').querySelectorAll('.pick').forEach(el => el.onclick = e => {
     if (e.target.closest('.zoom')) { zoom(img(e.target.closest('.zoom').dataset.z)); return; }
@@ -482,7 +565,7 @@ document.addEventListener('keydown', e => {
 document.addEventListener('keydown', e => { if (e.key === 'Escape') $('#lightbox').classList.remove('on'); });
 
 /* ---------- 6. 落選原因 ---------- */
-function chipHTML(){ return ISSUES.map(([k, ic, t]) => `<button class="chip" data-k="${k}"><span>${ic}</span>${t}</button>`).join(''); }
+function chipHTML(){ return ISSUES.map(([k, t]) => `<button class="chip" data-k="${k}"><img class="chip-ic" src="img/icons/issue-${k}.webp" alt="" draggable="false">${t}</button>`).join(''); }
 function bindChips(box, onChange){
   box.innerHTML = chipHTML();
   // 選了「其他」才出現的一行輸入框
@@ -526,14 +609,14 @@ function renderRate(){
   $('#rateImg').src = img(c); $('#rateZoom').onclick = () => zoom(img(c));
   $('#rateCount').textContent = `${ri + 1} / ${N_RATE}`;
   $('#rateBar').style.width = (ri / N_RATE * 100) + '%';
-  $('#faces').innerHTML = FACES.map(([f, t], i) => `<button class="face" data-s="${i + 1}" aria-label="${i + 1} 分 ${t}">${f}<small>${i + 1}</small></button>`).join('');
+  $('#faces').innerHTML = FACES.map(([f, t], i) => `<button class="face" data-s="${i + 1}" aria-label="${i + 1} 分 ${t}">${f}<small>${i + 1} ${t}</small></button>`).join('');
   $('#faces').querySelectorAll('.face').forEach(b => b.onclick = () => {
     $('#faces').querySelectorAll('.face').forEach(x => x.classList.remove('on')); b.classList.add('on');
     rScore = +b.dataset.s; $('#rateNext').disabled = false;
   });
   bindChips($('#rateChips'), ks => rIssues = ks);
   $('#rateNext').disabled = true;
-  $('#rateNext').textContent = ri === N_RATE - 1 ? '完成 ✔' : '下一張 ▶';
+  $('#rateNext').innerHTML = ri === N_RATE - 1 ? `完成 <span class="ui-ic">${UI_ICONS.check}</span>` : `下一張 <span class="ui-ic">${UI_ICONS.play}</span>`;
   if (rateList[ri + 1]) { const i = new Image(); i.src = img(rateList[ri + 1]); }
 }
 $('#rateNext').onclick = () => {
