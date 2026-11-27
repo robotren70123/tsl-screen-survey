@@ -94,6 +94,7 @@ h2{font-size:clamp(20px,4.5vw,28px);margin:0}
   align-items:center;justify-content:center;gap:4px;font-weight:600;border:3px solid transparent;transition:.12s}
 .chip span{font-size:30px;line-height:1}
 .chip.on{background:var(--chip-on);border-color:var(--accent)}
+.other-txt{width:100%;margin-top:8px;padding:10px 12px;font-size:16px;border-radius:12px;border:2px solid var(--accent);background:var(--card,transparent);color:inherit}
 @media (max-width:600px){ .chips{grid-template-columns:repeat(4,1fr);gap:6px} .chip{min-height:68px;font-size:13px;padding:6px 2px;line-height:1.2} .chip span{font-size:24px} }
 .reason-thumb{width:100%;max-width:420px;border-radius:12px;align-self:center;filter:grayscale(.3)}
 
@@ -247,7 +248,7 @@ pre{white-space:pre-wrap;word-break:break-all;font-size:12px;max-height:300px;ov
       <div class="panel">
         <p class="step-label">剛剛<strong>沒被選</strong>的這個畫面，哪裡不好？<small>（可複選）</small></p>
         <div class="chips" id="reasonChips"></div>
-        <div class="row center"><button class="ghost" id="reasonNone">🤷 說不上來</button>
+        <div class="row center"><button class="ghost" id="reasonNone">🤷 不知道</button>
           <button class="big-btn" id="reasonNext" disabled>繼續 ▶</button></div>
       </div>
     </div>
@@ -308,9 +309,9 @@ const N_RATE = 5;       // 第二關評分張數
 const STORE_KEY = 'tslSurvey2026_proto';
 const COUNTIES = ['基隆市','台北市','新北市','桃園市','新竹市','新竹縣','苗栗縣','台中市','彰化縣','南投縣','雲林縣','嘉義市','嘉義縣','台南市','高雄市','屏東縣','宜蘭縣','花蓮縣','台東縣','澎湖縣','金門縣','連江縣','住國外／其他'];
 const ISSUES = [ // 第一關原因、第二關問題共用同一組，方便分析
-  ['small','📏','手語框太小'], ['messy','🎨','背景太亂'], ['dark','💡','太暗'],
-  ['dist','↔️','人太遠／太近'], ['cover','🚫','被字幕擋住'], ['cut','✋','手被切掉'],
-  ['blur','🌫️','畫面模糊'], ['other','❓','其他']];
+  ['small','📏','手語框太小／太窄'], ['cover','🚫','被字幕／計時器擋住'], ['dist','↔️','人太遠／太近'],
+  ['dark','💡','太暗'], ['messy','🎨','背景太亂'], ['contrast','🖐️','手和衣服／背景顏色太像'],
+  ['shape','🔲','框的形狀不好'], ['blur','🌫️','畫面模糊'], ['other','❓','其他']];
 const FACES = [['😣','很差'],['🙁','不好'],['😐','普通'],['🙂','不錯'],['😄','很好']];
 
 /* ---------- 小工具 ---------- */
@@ -484,15 +485,28 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') $('#lightbox
 function chipHTML(){ return ISSUES.map(([k, ic, t]) => `<button class="chip" data-k="${k}"><span>${ic}</span>${t}</button>`).join(''); }
 function bindChips(box, onChange){
   box.innerHTML = chipHTML();
-  box.querySelectorAll('.chip').forEach(c => c.onclick = () => { c.classList.toggle('on'); onChange([...box.querySelectorAll('.chip.on')].map(x => x.dataset.k)); });
+  // 選了「其他」才出現的一行輸入框
+  let t = box.nextElementSibling;
+  if (!t || !t.classList.contains('other-txt')) {
+    t = document.createElement('input'); t.className = 'other-txt'; t.maxLength = 60;
+    t.placeholder = '其他是什麼？（可不填）'; box.after(t);
+  }
+  t.value = ''; t.hidden = true;
+  box.querySelectorAll('.chip').forEach(c => c.onclick = () => {
+    c.classList.toggle('on');
+    const ks = [...box.querySelectorAll('.chip.on')].map(x => x.dataset.k);
+    t.hidden = !ks.includes('other'); if (!t.hidden) t.focus();
+    onChange(ks);
+  });
 }
+function otherText(box){ const t = box.nextElementSibling; return t && !t.hidden ? t.value.trim() : ''; }
 function askReason(loser){
   let picked = [];
   $('#reasonImg').src = img(loser);
   $('#reasonNext').disabled = true;
   bindChips($('#reasonChips'), ks => { picked = ks; $('#reasonNext').disabled = !ks.length; });
   let sent = false;
-  const send = ks => { if (sent) return; sent = true; R.reasons.push({ afterPair: pi + 1, img: loser, issues: ks }); nextPair(); };
+  const send = ks => { if (sent) return; sent = true; R.reasons.push({ afterPair: pi + 1, img: loser, issues: ks, other: ks.length ? otherText($('#reasonChips')) : '' }); nextPair(); };
   $('#reasonNext').onclick = () => { if (!$('#reasonNext').disabled) send(picked); };
   $('#reasonNone').onclick = () => send([]);   // 只是差一點、說不出原因
   show('reason');
@@ -524,7 +538,7 @@ function renderRate(){
 }
 $('#rateNext').onclick = () => {
   if ($('#rateNext').disabled) return; $('#rateNext').disabled = true;
-  R.ratings.push({ img: rateList[ri], score: rScore, issues: rIssues });
+  R.ratings.push({ img: rateList[ri], score: rScore, issues: rIssues, other: otherText($('#rateChips')) });
   ri++;
   if (ri < N_RATE) { renderRate(); window.scrollTo(0, 0); } else finish();
 };
