@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>手語畫面大對決</title>
+<!-- 試作版：資料只存在這台裝置（localStorage），尚未連到 Google 試算表 -->
+<style>
+:root{
+  --bg:#f4f1ea; --card:#ffffff; --ink:#1f2328; --sub:#5b6270; --line:#d9d4c8;
+  --accent:#e0602b; --accent-ink:#ffffff; --good:#1f9d6b; --chip:#efeae0; --chip-on:#ffe3d4;
+  --shadow:0 6px 20px rgba(0,0,0,.08);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16181c; --card:#22252b; --ink:#eceff3; --sub:#a3aab5; --line:#373c45;
+    --accent:#ff7a45; --accent-ink:#1a1a1a; --good:#3ccf95; --chip:#2c3038; --chip-on:#5a3426;
+    --shadow:0 6px 20px rgba(0,0,0,.4);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);
+  font-family:"Noto Sans TC","Microsoft JhengHei","PingFang TC",system-ui,sans-serif;
+  font-size:17px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+.app{max-width:1360px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;padding:12px 16px 20px}
+.screen{display:none;flex:1;flex-direction:column;gap:14px;animation:fade .3s ease}
+.screen.on{display:flex}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h1{font-size:clamp(26px,6vw,40px);margin:8px 0 0;line-height:1.2}
+h2{font-size:clamp(20px,4.5vw,28px);margin:0}
+.sub{color:var(--sub)}
+.card{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:16px}
+.big-btn{background:var(--accent);color:var(--accent-ink);border-radius:999px;
+  padding:14px 28px;font-size:20px;font-weight:700;min-height:52px;box-shadow:var(--shadow);
+  transition:transform .1s}
+.big-btn:active{transform:scale(.97)}
+.big-btn[disabled]{opacity:.35;cursor:default}
+.ghost{border:2px solid var(--line);border-radius:999px;padding:10px 20px;min-height:46px;font-weight:600}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.center{align-items:center;text-align:center;justify-content:center}
+.spacer{flex:1}
+
+
+/* 上方進度列 */
+.topbar{display:flex;align-items:center;gap:12px}
+.stage{font-weight:800;white-space:nowrap}
+.bar{flex:1;height:12px;background:var(--chip);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .35s}
+.count{font-variant-numeric:tabular-nums;color:var(--sub);white-space:nowrap}
+
+/* 對決 */
+.question{text-align:center;font-weight:700;font-size:clamp(18px,4.2vw,24px);margin:0}
+.duel{display:grid;grid-template-columns:1fr 76px 1fr;gap:12px;align-items:stretch}
+/* 「差不多」：電腦放兩張圖中間的直條，手機放兩張圖中間的橫條 */
+.duel .pick{align-self:center}
+.tie{border:3px dashed var(--line);border-radius:16px;background:var(--chip);font-weight:800;font-size:20px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transition:.12s;
+  writing-mode:vertical-rl;letter-spacing:.2em}
+.tie .ic{writing-mode:horizontal-tb;font-size:28px;letter-spacing:0}
+@media (hover:hover){ .tie:hover{border-color:var(--accent);border-style:solid} }
+.tie.on{background:var(--chip-on);border-color:var(--accent);border-style:solid}
+@media (orientation:portrait), (max-width:700px){
+  .duel{grid-template-columns:1fr;justify-items:center;gap:8px}
+  .duel .pick,.duel .tie{width:min(100%, 60vh)}
+  .tie{writing-mode:horizontal-tb;flex-direction:row;min-height:50px;letter-spacing:.1em;font-size:18px}
+  .tie .ic{font-size:22px}
+}
+.pick{position:relative;border-radius:16px;overflow:hidden;background:#000;box-shadow:var(--shadow);
+  outline:4px solid transparent;transition:transform .12s, outline-color .12s;aspect-ratio:16/9}
+.pick img{width:100%;height:100%;object-fit:contain;display:block}
+@media (hover:hover){ .pick:hover{outline-color:var(--accent)} }
+.pick:active{transform:scale(.98)}
+.pick .tag{position:absolute;left:10px;top:10px;background:rgba(0,0,0,.6);color:#fff;border-radius:10px;
+  padding:2px 10px;font-weight:800;font-size:15px}
+.zoom{position:absolute;right:8px;bottom:8px;width:46px;height:46px;border-radius:50%;
+  background:rgba(255,255,255,.92);color:#111;font-size:22px;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.pick.win{outline-color:var(--good);transform:scale(1.02)}
+.pick.win::after{content:"✔";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:80px;color:#fff;background:rgba(31,157,107,.35);animation:pop .35s ease}
+.pick.lose{opacity:.35;filter:grayscale(1)}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+.tie-row{display:flex;justify-content:center;gap:10px}
+.hint{font-size:14px;color:var(--sub);text-align:center}
+.kbd{display:inline-block;border:1px solid var(--line);border-bottom-width:3px;border-radius:6px;padding:0 6px;font-size:13px}
+@media (hover:none){ .desk-only{display:none} }
+
+/* 原因／問題圖示 */
+.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.chip{background:var(--chip);border-radius:14px;padding:12px 8px;min-height:84px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:4px;font-weight:600;border:3px solid transparent;transition:.12s}
+.chip span{font-size:30px;line-height:1}
+.chip.on{background:var(--chip-on);border-color:var(--accent)}
+@media (max-width:600px){ .chips{grid-template-columns:repeat(4,1fr);gap:6px} .chip{min-height:68px;font-size:13px;padding:6px 2px;line-height:1.2} .chip span{font-size:24px} }
+.reason-thumb{width:100%;max-width:420px;border-radius:12px;align-self:center;filter:grayscale(.3)}
+
+/* 評分 */
+.rate-img{position:relative;border-radius:16px;overflow:hidden;background:#000;aspect-ratio:16/9;width:100%;flex:none}
+/* 評分／原因：手機上下排；電腦左邊大圖、右邊選單，一眼看完不用捲動 */
+.split{display:flex;flex-direction:column;gap:12px}
+.panel{display:flex;flex-direction:column;gap:10px}
+.panel .big-btn{align-self:center}
+.step-label{margin:4px 0 0;font-weight:800;font-size:18px}
+.step-label small{font-weight:500;color:var(--sub);font-size:14px}
+.split .reason-thumb{max-width:none}
+@media (min-width:900px) and (orientation:landscape){
+  .split{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(300px,1fr);gap:22px;align-items:center}
+  .split .rate-img,.split .reason-thumb{width:100%;max-height:calc(100vh - 140px);object-fit:contain}
+  .panel{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:16px 18px}
+  .panel .faces{justify-content:space-between}
+  .panel .face{width:58px;height:58px;font-size:30px}
+  .panel .chips{grid-template-columns:repeat(2,1fr);gap:8px}
+  .panel .chip{flex-direction:row;justify-content:flex-start;min-height:48px;padding:6px 12px;gap:8px;font-size:15px}
+  .panel .chip span{font-size:22px}
+  .panel .big-btn{align-self:stretch}
+}
+.rate-img img{width:100%;height:100%;object-fit:contain;display:block}
+.faces{display:flex;justify-content:center;gap:clamp(6px,2vw,14px)}
+.face{width:clamp(56px,16vw,76px);height:clamp(56px,16vw,76px);border-radius:50%;background:var(--chip);font-size:clamp(30px,8vw,40px);
+  display:flex;align-items:center;justify-content:center;border:3px solid transparent;transition:.12s;flex-direction:column;line-height:1}
+.face small{font-size:12px;font-weight:700;margin-top:2px;color:var(--sub)}
+.face.on{border-color:var(--accent);background:var(--chip-on);transform:scale(1.1)}
+
+/* 基本資料 */
+.q{display:flex;flex-direction:column;gap:8px}
+.q label.t{font-weight:700}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{background:var(--chip);border-radius:12px;padding:10px 16px;min-height:46px;font-weight:600;border:3px solid transparent}
+.opt.on{background:var(--chip-on);border-color:var(--accent)}
+select,textarea{font:inherit;padding:10px 12px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);min-height:46px}
+textarea{width:100%;min-height:90px}
+
+/* 教學示範 */
+.demo{position:relative;max-width:760px;width:100%;align-self:center}
+@media (orientation:portrait), (max-width:700px){ .demo{max-width:340px} }
+.demo .pick{cursor:default}
+.pointer{position:absolute;font-size:46px;pointer-events:none;left:50%;top:50%;transition:left .8s ease, top .8s ease, transform .15s;
+  filter:drop-shadow(0 3px 4px rgba(0,0,0,.4));z-index:5}
+.pointer.tap{transform:scale(.8)}
+.step-text{min-height:3em;text-align:center;font-weight:700;font-size:clamp(17px,4vw,21px)}
+
+/* 放大 */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;z-index:50;padding:10px}
+.lightbox.on{display:flex}
+.lightbox img{max-width:100%;max-height:100%;object-fit:contain}
+.lb-tip{position:absolute;bottom:18px;left:0;right:0;text-align:center;color:#ddd;font-size:15px;margin:0}
+@media (orientation:landscape){ .lb-tip{display:none} }
+.lightbox .close{position:absolute;top:12px;right:12px;width:52px;height:52px;border-radius:50%;background:#fff;color:#111;font-size:26px}
+
+/* 結尾 */
+.top3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (max-width:600px){.top3{grid-template-columns:1fr}}
+.top3 figure{margin:0;background:var(--card);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+.top3 img{width:100%;display:block;aspect-ratio:16/9;object-fit:contain;background:#000}
+.top3 figcaption{padding:6px 10px;font-weight:800}
+.placeholder{border:3px dashed var(--line);border-radius:14px;padding:16px;text-align:center;color:var(--sub)}
+pre{white-space:pre-wrap;word-break:break-all;font-size:12px;max-height:300px;overflow:auto;background:var(--chip);padding:10px;border-radius:10px}
+.toast{position:fixed;left:50%;top:20%;transform:translate(-50%,0);background:var(--good);color:#fff;font-weight:800;
+  padding:10px 22px;border-radius:999px;font-size:20px;opacity:0;pointer-events:none;transition:.25s;z-index:60}
+.toast.on{opacity:1;transform:translate(-50%,-10px)}
+.proto{font-size:12px;color:var(--sub);text-align:center;margin-top:auto;padding-top:8px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- 0. 封面 -->
+  <section class="screen center" id="s-intro">
+    <h1>手語畫面大對決 🏆</h1>
+    <p class="sub">2026 公辦政見發表會・手語畫面評比</p>
+    <p>兩個畫面，選出<strong>比較容易看清楚手語</strong>的那一個。<br>大約 4 分鐘，不用打字。</p>
+    <p class="sub" style="font-size:14px">縣市名稱與人物臉部都已去識別，只評畫面，不評翻譯員的翻譯。</p>
+    <button class="big-btn" data-go="tutorial">開始 ▶</button>
+  </section>
+
+  <!-- 1. 動畫教學 -->
+  <section class="screen" id="s-tutorial">
+    <div class="topbar"><span class="stage">玩法教學</span><span class="spacer"></span>
+      <button class="ghost" id="skipTut">跳過 ⏭</button></div>
+    <p class="step-text" id="tutText">每一題會出現兩個畫面</p>
+    <div class="duel demo" id="demo">
+      <div class="pick" id="demoA"><span class="tag">A</span></div>
+      <div class="tie" id="demoTie"><span class="ic">🤝</span>差不多</div>
+      <div class="pick" id="demoB"><span class="tag">B</span></div>
+      <div class="pointer" id="pointer">👆</div>
+    </div>
+  </section>
+
+  <!-- 2. 練習題 -->
+  <section class="screen" id="s-practice">
+    <div class="topbar"><span class="stage">練習一題</span></div>
+    <p class="question">換你試試看：哪一個比較容易看清楚手語？</p>
+    <div class="duel" id="practiceDuel"></div>
+    <p class="hint">（練習題不計分）</p>
+  </section>
+
+  <!-- 3. 基本資料 -->
+  <section class="screen" id="s-profile">
+    <div class="topbar"><span class="stage">關於你</span><div class="bar"><i style="width:100%"></i></div></div>
+    <div class="card q"><label class="t">1. 你的身分</label>
+      <div class="opts" data-q="identity">
+        <button class="opt" data-v="聾人">🤟 聾人（主要用手語）</button>
+        <button class="opt" data-v="聽障">👂 聽障（主要用口語）</button>
+        <button class="opt" data-v="聽人">🗣️ 聽人</button></div></div>
+    <div class="card q"><label class="t">2. 性別</label>
+      <div class="opts" data-q="gender">
+        <button class="opt" data-v="男">男</button><button class="opt" data-v="女">女</button>
+        <button class="opt" data-v="其他">其他</button></div></div>
+    <div class="card q"><label class="t">3. 年齡</label>
+      <div class="opts" data-q="age">
+        <button class="opt" data-v="19以下">19 歲以下</button><button class="opt" data-v="20-29">20–29</button>
+        <button class="opt" data-v="30-39">30–39</button><button class="opt" data-v="40-49">40–49</button>
+        <button class="opt" data-v="50-59">50–59</button><button class="opt" data-v="60以上">60 歲以上</button></div></div>
+    <div class="card q"><label class="t" for="county">4. 戶籍地</label>
+      <select id="county"><option value="">請選擇</option></select></div>
+    <div class="card q"><label class="t">5. 你有看過 2026 年的公辦電視政見發表會嗎？</label>
+      <div class="opts" data-q="watched">
+        <button class="opt" data-v="有">有</button><button class="opt" data-v="沒有">沒有</button></div></div>
+    <div class="row center"><button class="big-btn" id="profileNext" disabled>進入第一關 ▶</button></div>
+  </section>
+
+  <!-- 4. 關卡開場 -->
+  <section class="screen center" id="s-stage">
+    <p class="sub" id="stageNo">第一關</p>
+    <h1 id="stageTitle">畫面對決</h1>
+    <p id="stageDesc"></p>
+    <button class="big-btn" id="stageGo">出發 ▶</button>
+  </section>
+
+  <!-- 5. 第一關：二選一 -->
+  <section class="screen" id="s-duel">
+    <div class="topbar"><span class="stage">第一關 對決</span><div class="bar"><i id="duelBar"></i></div>
+      <span class="count" id="duelCount"></span></div>
+    <p class="question">哪一個比較容易看清楚手語？</p>
+    <div class="duel" id="duel"></div>
+    <p class="hint desk-only">鍵盤：<span class="kbd">←</span> 選 A　<span class="kbd">→</span> 選 B　<span class="kbd">↓</span> 差不多</p>
+  </section>
+
+  <!-- 6. 落選原因 -->
+  <section class="screen" id="s-reason">
+    <div class="topbar"><span class="stage">小問題</span></div>
+    <div class="split">
+      <img class="reason-thumb" id="reasonImg" alt="剛剛沒被選的畫面">
+      <div class="panel">
+        <p class="step-label">剛剛<strong>沒被選</strong>的這個畫面，哪裡不好？<small>（可複選）</small></p>
+        <div class="chips" id="reasonChips"></div>
+        <div class="row center"><button class="ghost" id="reasonNone">🤷 說不上來</button>
+          <button class="big-btn" id="reasonNext" disabled>繼續 ▶</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. 第二關：評分 -->
+  <section class="screen" id="s-rate">
+    <div class="topbar"><span class="stage">第二關 打分數</span><div class="bar"><i id="rateBar"></i></div>
+      <span class="count" id="rateCount"></span></div>
+    <div class="split">
+      <div class="rate-img"><img id="rateImg" alt="評分的畫面"><button class="zoom" id="rateZoom" aria-label="放大">🔍</button></div>
+      <div class="panel">
+        <p class="step-label">① 看手語清不清楚？</p>
+        <div class="faces" id="faces"></div>
+        <p class="step-label">② 有哪些問題？<small>（可複選，沒有就跳過）</small></p>
+        <div class="chips" id="rateChips"></div>
+        <button class="big-btn" id="rateNext" disabled>下一張 ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. 結尾 -->
+  <section class="screen" id="s-end">
+    <h1 class="center" style="text-align:center">🎉 完成！謝謝你</h1>
+    <div class="card"><h2>你心中最好看清楚的畫面</h2>
+      <p class="sub" style="margin-top:4px">依你剛剛的選擇和分數推算，只是參考</p>
+      <div class="top3" id="myTop"></div></div>
+    <div class="card q"><label class="t" for="comment">還有想說的嗎？（可不填）</label>
+      <textarea id="comment" placeholder="例如：希望手語框再大一點……"></textarea></div>
+    <div class="row center"><button class="big-btn" id="submitBtn">送出 ✔</button></div>
+    <div class="row center" id="afterSubmit" style="display:none">
+      <span>✅ 謝謝試玩！操作上有什麼不順、看不懂的地方，請告訴邀請你的人</span></div>
+    <details class="card" id="debugBox" hidden><summary>測試用：看記錄下來的資料（JSON）</summary><pre id="json"></pre></details>
+    <div class="row center"><button class="ghost" id="restart">🔄 重來（測試用）</button></div>
+  </section>
+
+  <!-- 已填過 -->
+  <section class="screen center" id="s-done">
+    <h2>這台裝置已經填過了 🙏</h2>
+    <p class="sub">謝謝你的參與！</p>
+    <button class="ghost" id="restart2">🔄 重來（測試用）</button>
+  </section>
+
+  <p class="proto">測試版・你的回答只存在這台裝置，不會上傳</p>
+</div>
+
+<div class="lightbox" id="lightbox"><img id="lbImg" alt="放大的畫面"><p class="lb-tip">📱 手機橫放可以看得更大</p><button class="close" id="lbClose" aria-label="關閉">✕</button></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- 設定（正式版改這裡） ---------- */
+// 22 張首長場畫面（代號與縣市對照在 web 資料夾外的「代號對照表.csv」）
+// ※ 新北市暫用「新北市-1」，待決定
+const IMAGES = ['q01','q11','q14','q15','q16','q29','q31','q37','q41','q54','q57','q63','q65','q66','q71','q72','q74','q76','q77','q79','q80','q83'];
+const N_PAIRS = 15;     // 第一關對決組數
+const REASON_EVERY = 3; // 每幾組問一次落選原因
+const N_RATE = 5;       // 第二關評分張數
+const STORE_KEY = 'tslSurvey2026_proto';
+const COUNTIES = ['基隆市','台北市','新北市','桃園市','新竹市','新竹縣','苗栗縣','台中市','彰化縣','南投縣','雲林縣','嘉義市','嘉義縣','台南市','高雄市','屏東縣','宜蘭縣','花蓮縣','台東縣','澎湖縣','金門縣','連江縣','住國外／其他'];
+const ISSUES = [ // 第一關原因、第二關問題共用同一組，方便分析
+  ['small','📏','手語框太小'], ['messy','🎨','背景太亂'], ['dark','💡','太暗'],
+  ['dist','↔️','人太遠／太近'], ['cover','🚫','被字幕擋住'], ['cut','✋','手被切掉'],
+  ['blur','🌫️','畫面模糊'], ['other','❓','其他']];
+const FACES = [['😣','很差'],['🙁','不好'],['😐','普通'],['🙂','不錯'],['😄','很好']];
+
+/* ---------- 小工具 ---------- */
+const $ = s => document.querySelector(s);
+const img = c => `img/${c}.jpg`;
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+const store = { get(){ try { return JSON.parse(localStorage.getItem(STORE_KEY)); } catch(e){ return null; } },
+                set(v){ try { localStorage.setItem(STORE_KEY, JSON.stringify(v)); } catch(e){} },
+                clear(){ try { localStorage.removeItem(STORE_KEY); } catch(e){} } };
+function show(id){ document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === 's-' + id)); window.scrollTo(0,0); current = id; }
+function toast(t){ const el = $('#toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 700); }
+function zoom(src){ $('#lbImg').src = src; $('#lightbox').classList.add('on'); }
+$('#lbClose').onclick = () => $('#lightbox').classList.remove('on');
+$('#lightbox').onclick = e => { if (e.target.id === 'lightbox') $('#lightbox').classList.remove('on'); };
+let current = 'intro';
+
+/* ---------- 抽題：15 組，每張圖出現 1～2 次，不重複配對 ---------- */
+function makePairs(){
+  for (let tries = 0; tries < 200; tries++){
+    const need = N_PAIRS * 2;
+    let seq = shuffle(IMAGES);
+    while (seq.length < need) seq = seq.concat(shuffle(IMAGES));
+    seq = seq.slice(0, need);
+    const pairs = [], seen = new Set(); let ok = true;
+    for (let i = 0; i < need; i += 2){
+      const a = seq[i], b = seq[i + 1], key = [a, b].sort().join('|');
+      if (a === b || seen.has(key)) { ok = false; break; }
+      seen.add(key); pairs.push(Math.random() < .5 ? [a, b] : [b, a]); // 左右隨機
+    }
+    if (ok) return pairs;
+  }
+}
+
+/* ---------- 結果資料（正式版把這包 POST 到 Apps Script） ---------- */
+let R;
+function newResult(){
+  R = { session: uid(), version: 'proto-2026-11-27', started: new Date().toISOString(),
+        device: matchMedia('(hover:none)').matches ? 'touch' : 'mouse', screen: `${screen.width}x${screen.height}`,
+        profile: {}, pairs: [], reasons: [], ratings: [], comment: '', finished: null };
+}
+
+/* ---------- 0. 封面 ---------- */
+document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => { show(b.dataset.go); if (b.dataset.go === 'tutorial') runTutorial(); });
+
+/* ---------- 1. 動畫教學（假畫面，不是真的題目） ---------- */
+// 用簡單圖形畫兩個「示範畫面」：A 手語框大又亮、B 手語框小又暗
+function fakeFrame(good){
+  return `<svg viewBox="0 0 160 90" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    <rect width="160" height="90" fill="${good ? '#3b5b8c' : '#4a3b3b'}"/>
+    <rect x="10" y="20" width="${good ? 70 : 110}" height="60" rx="4" fill="#c9d3e0" opacity=".55"/>
+    <circle cx="${good ? 45 : 65}" cy="38" r="9" fill="#e9c9a8"/><rect x="${good ? 33 : 53}" y="48" width="24" height="30" rx="5" fill="#2d3e50"/>
+    ${good
+      ? `<rect x="88" y="6" width="66" height="78" rx="6" fill="#f2f6fa"/><circle cx="121" cy="30" r="10" fill="#e9c9a8"/>
+         <rect x="106" y="42" width="30" height="36" rx="6" fill="#1d2b3a"/><circle cx="101" cy="52" r="5" fill="#e9c9a8"/><circle cx="141" cy="48" r="5" fill="#e9c9a8"/>`
+      : `<rect x="128" y="6" width="26" height="26" rx="4" fill="#4b4b4b"/><circle cx="141" cy="16" r="4" fill="#9c8a7a"/><rect x="135" y="21" width="12" height="10" rx="2" fill="#222"/>`}
+  </svg>`;
+}
+let tutTimer = [];
+function runTutorial(){
+  tutTimer.forEach(clearTimeout); tutTimer = [];
+  const A = $('#demoA'), B = $('#demoB'), p = $('#pointer'), t = $('#tutText');
+  A.innerHTML = '<span class="tag">A</span>' + fakeFrame(true) + '<span class="zoom">🔍</span>';
+  B.innerHTML = '<span class="tag">B</span>' + fakeFrame(false) + '<span class="zoom">🔍</span>';
+  A.className = B.className = 'pick';
+  const at = (el, dx = .5, dy = .5) => { const r = el.getBoundingClientRect(), d = $('#demo').getBoundingClientRect();
+    p.style.left = (r.left - d.left + r.width * dx - 14) + 'px'; p.style.top = (r.top - d.top + r.height * dy - 6) + 'px'; };
+  const tap = () => { p.classList.add('tap'); setTimeout(() => p.classList.remove('tap'), 180); };
+  const steps = [
+    [0,    () => { t.textContent = '每一題會出現兩個畫面'; at($('#demo'), .5, .5); }],
+    [1600, () => { t.textContent = '看哪一個比較容易看清楚手語'; at(B); }],
+    [3000, () => { at(A); }],
+    [4200, () => { t.textContent = '點一下比較好的那一個 👍'; tap(); A.classList.add('win'); B.classList.add('lose'); }],
+    [6200, () => { A.className = B.className = 'pick'; t.textContent = '看不清楚？按 🔍 可以放大'; at(B, .9, .85); }],
+    [7400, () => { tap(); }],
+    [8800, () => { t.textContent = '兩個差不多，就按中間的「差不多」'; at($('#demoTie')); }],
+    [10000,() => { tap(); $('#demoTie').classList.add('on'); }],
+    [11000,() => { $('#demoTie').classList.remove('on'); }],
+    [11400,() => { t.textContent = '準備好了嗎？我們先練習一題！'; }],
+    [13000,() => { startPractice(); }]];
+  steps.forEach(([ms, fn]) => tutTimer.push(setTimeout(() => { if (current === 'tutorial') fn(); }, ms)));
+}
+$('#skipTut').onclick = () => { tutTimer.forEach(clearTimeout); startPractice(); };
+
+/* ---------- 2. 練習題（不記錄） ---------- */
+function startPractice(){
+  show('practice');
+  const goodLeft = Math.random() < .5;
+  const d = $('#practiceDuel');
+  const pc = (g, i) => `<button class="pick" data-good="${g}"><span class="tag">${'AB'[i]}</span>${fakeFrame(g)}</button>`;
+  d.innerHTML = pc(goodLeft, 0) + `<button class="tie" id="practiceTie"><span class="ic">🤝</span>差不多</button>` + pc(!goodLeft, 1);
+  $('#practiceTie').onclick = () => toast('再仔細比比看 👀');
+  d.querySelectorAll('.pick').forEach(b => b.onclick = () => {
+    if (b.dataset.good === 'true'){
+      b.classList.add('win'); d.querySelectorAll('.pick').forEach(o => o !== b && o.classList.add('lose'));
+      toast('答對了！✨'); setTimeout(() => show('profile'), 900);
+    } else { toast('再看看另一個 👀'); }
+  });
+}
+
+/* ---------- 3. 基本資料 ---------- */
+COUNTIES.forEach(c => $('#county').insertAdjacentHTML('beforeend', `<option>${c}</option>`));
+document.querySelectorAll('.opts').forEach(g => g.querySelectorAll('.opt').forEach(o => o.onclick = () => {
+  g.querySelectorAll('.opt').forEach(x => x.classList.remove('on')); o.classList.add('on');
+  R.profile[g.dataset.q] = o.dataset.v; checkProfile();
+}));
+$('#county').onchange = e => { R.profile.county = e.target.value; checkProfile(); };
+function checkProfile(){ $('#profileNext').disabled = !['identity','gender','age','county','watched'].every(k => R.profile[k]); }
+$('#profileNext').onclick = () => stageIntro(1);
+
+/* ---------- 4. 關卡開場 ---------- */
+function stageIntro(n){
+  $('#stageNo').textContent = n === 1 ? '第一關' : '第二關';
+  $('#stageTitle').textContent = n === 1 ? '畫面對決 ⚔️' : '打分數 ⭐';
+  $('#stageDesc').innerHTML = n === 1
+    ? `共 ${N_PAIRS} 題，每題選出<strong>比較容易看清楚手語</strong>的畫面`
+    : `共 ${N_RATE} 張，每張給 1～5 分`;
+  $('#stageGo').onclick = n === 1 ? startDuel : startRate;
+  show('stage');
+}
+
+/* ---------- 5. 第一關：對決 ---------- */
+let pairs, pi, pairStart, pendingReason, locked;
+function startDuel(){ pairs = makePairs(); pi = 0; pendingReason = false; R.pairShown = pairs; show('duel'); renderPair(); }
+function renderPair(){
+  locked = false;
+  const [a, b] = pairs[pi];
+  $('#duelCount').textContent = `${pi + 1} / ${N_PAIRS}`;
+  $('#duelBar').style.width = (pi / N_PAIRS * 100) + '%';
+  const card = (c, i) =>
+    `<div class="pick" role="button" tabindex="0" data-side="${'LR'[i]}" aria-label="選畫面 ${'AB'[i]}">
+       <span class="tag">${'AB'[i]}</span><img src="${img(c)}" alt="畫面 ${'AB'[i]}" draggable="false">
+       <button class="zoom" data-z="${c}" aria-label="放大畫面 ${'AB'[i]}">🔍</button></div>`;
+  $('#duel').innerHTML = card(a, 0) + `<button class="tie" id="tieBtn"><span class="ic">🤝</span>差不多</button>` + card(b, 1);
+  $('#tieBtn').onclick = () => vote('T');
+  $('#duel').querySelectorAll('.pick').forEach(el => el.onclick = e => {
+    if (e.target.closest('.zoom')) { zoom(img(e.target.closest('.zoom').dataset.z)); return; }
+    vote(el.dataset.side);
+  });
+  pairStart = performance.now();
+  // 預先載入下一組
+  if (pairs[pi + 1]) pairs[pi + 1].forEach(c => { const i = new Image(); i.src = img(c); });
+}
+function vote(side){ // 'L' / 'R' / 'T'(差不多)
+  if (locked) return; locked = true;
+  const [a, b] = pairs[pi];
+  const winner = side === 'L' ? a : side === 'R' ? b : null, loser = side === 'L' ? b : side === 'R' ? a : null;
+  R.pairs.push({ n: pi + 1, left: a, right: b, choice: side, winner, loser, ms: Math.round(performance.now() - pairStart) });
+  const els = $('#duel').querySelectorAll('.pick');
+  if (side === 'T') { $('#tieBtn').classList.add('on'); } else {
+    els.forEach(el => el.classList.add(el.dataset.side === side ? 'win' : 'lose'));
+  }
+  if ((pi + 1) % REASON_EVERY === 0) pendingReason = true;
+  setTimeout(() => {
+    if (pendingReason && loser) { pendingReason = false; askReason(loser); return; }
+    nextPair();
+  }, 650);
+}
+function nextPair(){
+  pi++;
+  if (pi < N_PAIRS) { show('duel'); renderPair(); }
+  else { $('#duelBar').style.width = '100%'; stageIntro(2); toast('第一關完成！🎉'); }
+}
+document.addEventListener('keydown', e => {
+  if (current !== 'duel' || $('#lightbox').classList.contains('on')) return;
+  if (e.key === 'ArrowLeft') vote('L'); else if (e.key === 'ArrowRight') vote('R'); else if (e.key === 'ArrowDown') vote('T');
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') $('#lightbox').classList.remove('on'); });
+
+/* ---------- 6. 落選原因 ---------- */
+function chipHTML(){ return ISSUES.map(([k, ic, t]) => `<button class="chip" data-k="${k}"><span>${ic}</span>${t}</button>`).join(''); }
+function bindChips(box, onChange){
+  box.innerHTML = chipHTML();
+  box.querySelectorAll('.chip').forEach(c => c.onclick = () => { c.classList.toggle('on'); onChange([...box.querySelectorAll('.chip.on')].map(x => x.dataset.k)); });
+}
+function askReason(loser){
+  let picked = [];
+  $('#reasonImg').src = img(loser);
+  $('#reasonNext').disabled = true;
+  bindChips($('#reasonChips'), ks => { picked = ks; $('#reasonNext').disabled = !ks.length; });
+  let sent = false;
+  const send = ks => { if (sent) return; sent = true; R.reasons.push({ afterPair: pi + 1, img: loser, issues: ks }); nextPair(); };
+  $('#reasonNext').onclick = () => { if (!$('#reasonNext').disabled) send(picked); };
+  $('#reasonNone').onclick = () => send([]);   // 只是差一點、說不出原因
+  show('reason');
+}
+
+/* ---------- 7. 第二關：評分 ---------- */
+let rateList, ri, rScore, rIssues;
+function startRate(){
+  // 優先抽第一關比較少出現的畫面，讓每張被看到的次數平均一點
+  const seen = {}; R.pairs.forEach(p => { seen[p.left] = (seen[p.left] || 0) + 1; seen[p.right] = (seen[p.right] || 0) + 1; });
+  rateList = shuffle(IMAGES).sort((x, y) => (seen[x] || 0) - (seen[y] || 0)).slice(0, N_RATE);
+  rateList = shuffle(rateList); ri = 0; show('rate'); renderRate();
+}
+function renderRate(){
+  rScore = null; rIssues = [];
+  const c = rateList[ri];
+  $('#rateImg').src = img(c); $('#rateZoom').onclick = () => zoom(img(c));
+  $('#rateCount').textContent = `${ri + 1} / ${N_RATE}`;
+  $('#rateBar').style.width = (ri / N_RATE * 100) + '%';
+  $('#faces').innerHTML = FACES.map(([f, t], i) => `<button class="face" data-s="${i + 1}" aria-label="${i + 1} 分 ${t}">${f}<small>${i + 1}</small></button>`).join('');
+  $('#faces').querySelectorAll('.face').forEach(b => b.onclick = () => {
+    $('#faces').querySelectorAll('.face').forEach(x => x.classList.remove('on')); b.classList.add('on');
+    rScore = +b.dataset.s; $('#rateNext').disabled = false;
+  });
+  bindChips($('#rateChips'), ks => rIssues = ks);
+  $('#rateNext').disabled = true;
+  $('#rateNext').textContent = ri === N_RATE - 1 ? '完成 ✔' : '下一張 ▶';
+  if (rateList[ri + 1]) { const i = new Image(); i.src = img(rateList[ri + 1]); }
+}
+$('#rateNext').onclick = () => {
+  if ($('#rateNext').disabled) return; $('#rateNext').disabled = true;
+  R.ratings.push({ img: rateList[ri], score: rScore, issues: rIssues });
+  ri++;
+  if (ri < N_RATE) { renderRate(); window.scrollTo(0, 0); } else finish();
+};
+
+/* ---------- 8. 結尾 ---------- */
+function myTop3(){
+  // 粗略推算：對決勝率（差不多算半勝）＋評分，只當作給填答者的趣味回饋
+  const s = {};
+  const add = (c, k, v) => { s[c] = s[c] || { w: 0, n: 0, r: [] }; s[c][k] += v; };
+  R.pairs.forEach(p => {
+    add(p.left, 'n', 1); add(p.right, 'n', 1);
+    if (p.choice === 'T') { add(p.left, 'w', .5); add(p.right, 'w', .5); } else add(p.winner, 'w', 1);
+  });
+  R.ratings.forEach(r => { s[r.img] = s[r.img] || { w: 0, n: 0, r: [] }; s[r.img].r.push(r.score); });
+  const score = o => { const wr = o.n ? o.w / o.n : .5; const rs = o.r.length ? (o.r.reduce((a, b) => a + b) / o.r.length - 1) / 4 : wr; return (o.n ? wr : rs) * .6 + rs * .4; };
+  return Object.entries(s).sort((a, b) => score(b[1]) - score(a[1])).slice(0, 3).map(e => e[0]);
+}
+function finish(){
+  $('#myTop').innerHTML = myTop3().map((c, i) => `<figure><img src="${img(c)}" alt="第 ${i + 1} 名"><figcaption>${['🥇','🥈','🥉'][i]} 第 ${i + 1} 名</figcaption></figure>`).join('');
+  $('#json').textContent = JSON.stringify(R, null, 1);
+  $('#afterSubmit').style.display = 'none'; $('#submitBtn').style.display = '';
+  show('end');
+}
+$('#submitBtn').onclick = () => {
+  R.comment = $('#comment').value.trim(); R.finished = new Date().toISOString(); delete R.pairShown;
+  store.set({ done: true, result: R });   // 正式版：改成送到 Apps Script
+  $('#json').textContent = JSON.stringify(R, null, 1);
+  $('#submitBtn').style.display = 'none'; $('#afterSubmit').style.display = '';
+  toast('已送出，謝謝！');
+};
+function restart(){ store.clear(); newResult(); $('#comment').value = ''; document.querySelectorAll('.opt.on').forEach(o => o.classList.remove('on')); $('#county').value = ''; checkProfile(); show('intro'); }
+$('#restart').onclick = restart; $('#restart2').onclick = restart;
+
+/* ---------- 開始 ---------- */
+if (/[?&]debug/.test(location.search)) $('#debugBox').hidden = false; // 網址加 ?debug 才顯示資料
+newResult();
+const saved = store.get();
+show(saved && saved.done ? 'done' : 'intro');
+</script>
+</body>
+</html>
