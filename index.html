@@ -273,6 +273,9 @@ mark.tbd{background:#fff1a8;color:#6b4e00;border-radius:6px;padding:0 4px;font-w
 .rule-tv .hand.h2{animation-delay:-.55s}
 .rule-tv .rp{opacity:0;transition:opacity .4s ease} /* 淡入淡出 0.4 秒，清楚的 1 秒才看得到 */
 .rule-tv.blur .rb,.rule-tv.look .rl{opacity:1}
+/* 第一句循環：4 秒一輪＝清楚約 1 秒、霧化約 3 秒（含 0.4 秒淡入淡出） */
+.rule-tv.cycle .rb{animation:ruleCycle 4s ease-in-out infinite}
+@keyframes ruleCycle{0%,20%{opacity:0}30%,90%{opacity:1}100%{opacity:0}}
 .rule-tv .rl-frame{animation:ruleDash 1.2s linear infinite}
 @keyframes ruleDash{to{stroke-dashoffset:-30}}
 .rule-btns{position:sticky;bottom:8px;z-index:3}
@@ -285,7 +288,7 @@ mark.tbd{background:#fff1a8;color:#6b4e00;border-radius:6px;padding:0 4px;font-w
   .rule-wrap .dots{grid-area:dots}
   .rule-btns{grid-area:btn}
 }
-@media (prefers-reduced-motion: reduce){ .rule-tv *{animation:none !important;transition:opacity .3s !important} }
+@media (prefers-reduced-motion: reduce){ .rule-tv *{animation:none !important;transition:opacity .3s !important} .rule-tv.cycle .rb{opacity:1} }
 
 /* 主辦單位品牌列（台灣聾人聯盟 logo＋活動名稱） */
 .brand-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -1000,16 +1003,8 @@ function startRule(){ rri = 0; show('rule'); renderRule(); }
 function renderRule(){
   const s = RULE[rri], cap = $('#ruleCap'), tv = $('#ruleTv');
   clearTimeout(ruleT);
-  // 第一句：清楚 1 秒 → 霧化維持 5 秒 → 再清楚……一直循環，讓人看懂是後製模糊的（換句或離開本頁就停）
-  if (rri === 0) {
-    const loop = blur => {
-      if (current !== 'rule' || rri !== 0) return;
-      tv.className = blur ? 'rule-tv blur' : 'rule-tv';
-      ruleT = setTimeout(() => loop(!blur), blur ? 5000 : 1000);
-    };
-    loop(false);
-  }
-  else tv.className = 'rule-tv ' + s.tv;
+  // 第一句：清楚約 1 秒 → 霧化約 3 秒，一直循環（用 CSS 動畫 .cycle，不靠計時器，手機省電模式也不會停）
+  tv.className = 'rule-tv ' + (rri === 0 ? 'cycle' : s.tv);
   cap.innerHTML = s.text; cap.classList.remove('in'); void cap.offsetWidth; cap.classList.add('in');
   $('#ruleDots').innerHTML = RULE.map((_, i) => `<i class="${i === rri ? 'on' : ''}"></i>`).join('');
   $('#rulePrev').style.visibility = rri ? 'visible' : 'hidden';
