@@ -628,6 +628,8 @@ const N_PAIRS = 15;     // 第一關對決組數
 const REASON_EVERY = 0; // 每幾組問一次落選原因；0 = 不問（第二關已經有問題複選，避免重複）
 const N_RATE = 5;       // 第二關評分張數
 const STORE_KEY = 'tslSurvey2026_proto';
+// 正式收資料網址（Google Apps Script 部署後的 /exec 網址；留空＝試作模式，只存這台裝置不送出）
+const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbzB_CyoxazxMJi1jeAYjXpFjplltNyb266vY52YEXvA-tPxvxY1c967G15GEx9kqYWN/exec';
 const COUNTIES = ['基隆市','台北市','新北市','桃園市','新竹市','新竹縣','苗栗縣','台中市','彰化縣','南投縣','雲林縣','嘉義市','嘉義縣','台南市','高雄市','屏東縣','宜蘭縣','花蓮縣','台東縣','澎湖縣','金門縣','連江縣','住國外／其他'];
 const ISSUES = [ // 第一關原因、第二關問題共用同一組，方便分析（圖示放 img/icons/issue-<key>.webp）
   ['small','手語框太小／太窄'], ['cover','被字幕／計時器擋住'], ['dist','人太遠／太近'],
@@ -854,7 +856,7 @@ function makePairs(){
 /* ---------- 結果資料（正式版把這包 POST 到 Apps Script） ---------- */
 let R;
 function newResult(){
-  R = { session: uid(), version: 'proto-2026-11-27', started: new Date().toISOString(),
+  R = { session: uid(), version: 'v1-2026-11-28', started: new Date().toISOString(),
         device: matchMedia('(hover:none)').matches ? 'touch' : 'mouse', screen: `${screen.width}x${screen.height}`,
         profile: {}, pairs: [], reasons: [], ratings: [], comment: '', finished: null };
 }
@@ -1133,26 +1135,99 @@ function myTop3(){
   const score = o => { const wr = o.n ? o.w / o.n : .5; const rs = o.r.length ? (o.r.reduce((a, b) => a + b) / o.r.length - 1) / 4 : wr; return (o.n ? wr : rs) * .6 + rs * .4; };
   return Object.entries(s).sort((a, b) => score(b[1]) - score(a[1])).slice(0, 3).map(e => e[0]);
 }
-function finish(){
-  $('#myTop').innerHTML = myTop3().map((c, i) => `<figure><img src="${img(c)}" alt="第 ${i + 1} 名"><figcaption>第 ${i + 1} 名</figcaption></figure>`).join('');
-  $('#json').textContent = JSON.stringify(R, null, 1);
-  $('#afterSubmit').style.display = 'none'; $('#submitBtn').style.display = '';
-  show('end');
+function buildPayload(stage){
+  const copy = Object.assign({}, R, { stage });
+  delete copy.pairShown;
+  return copy;
 }
-$('#submitBtn').onclick = () => {
-  R.comment = $('#comment').value.trim(); R.finished = new Date().toISOString(); delete R.pairShown;
-  store.set({ done: true, result: R });   // 正式版：改成送到 Apps Script
-  $('#json').textContent = JSON.stringify(R, null, 1);
-  $('#submitBtn').style.display = 'none'; $('#afterSubmit').style.display = '';
+async function postSurvey(stage, customPayload){
+  const payload = customPayload || buildPayload(stage);
+  if (!SUBMIT_URL) return true; // 試作模式：尚未填回收網址時僅存本機
+  try {
+    const res = await fetch(SUBMIT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // 避開 CORS 預檢又能讀回應
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) return false;
+    const j = await res.json().catch(() => null);
+    return !!(j && j.ok);
+  } catch (e) {
+    return false;
+  }
+}
+function finish(){
+  R.finished = new Date().toISOString();
+  const autoPayload = buildPayload('auto_complete');
+  $('#myTop').innerHTML = myTop3().map((c, i) => `<figure><img src="${img(c)}" alt="第 ${i + 1} 名"><figcaption>第 ${i + 1} 名</figcaption></figure>`).join('');
+  $('#json').textContent = JSON.stringify(autoPayload, null, 1);
+  $('#afterSubmit').style.display = 'none';
+  $('#submitBtn').style.display = '';
+  $('#submitBtn').disabled = false;
+  $('#submitBtn').innerHTML = `送出評審結果 <span class="ui-ic">${UI_ICONS.check}</span>`;
+  show('end');
+  // 階段 1（靜默保底）：進入結尾頁立刻先送出核心評審資料，避免看到「審查完成」印章直接關網頁而漏單
+  if (SUBMIT_URL) {
+    store.set({ done: false, pendingSync: true, payload: autoPayload, result: autoPayload });
+    postSurvey('auto_complete', autoPayload).then(ok => {
+      if (ok) {
+        const cur = store.get();
+        if (cur && cur.payload && cur.payload.session === autoPayload.session && !cur.done) {
+          store.set(Object.assign({}, cur, { pendingSync: false }));
+        }
+      }
+    });
+  }
+}
+$('#submitBtn').onclick = async () => {
+  const btn = $('#submitBtn');
+  if (btn.disabled) return;
+  btn.disabled = true;
+  btn.textContent = '送出中…';
+  R.comment = $('#comment').value.trim();
+  R.finished = new Date().toISOString();
+  const payload = buildPayload('submitted');
+  $('#json').textContent = JSON.stringify(payload, null, 1);
+  if (SUBMIT_URL) {
+    store.set({ done: false, pendingSync: true, payload, result: payload });
+    const ok = await postSurvey('submitted', payload);
+    if (!ok) {
+      btn.disabled = false;
+      btn.innerHTML = `再試一次送出 <span class="ui-ic">${UI_ICONS.check}</span>`;
+      toast('網路不穩，資料還留著，請再按一次送出');
+      return;
+    }
+  }
+  store.set({ done: true, pendingSync: false, payload, result: payload });
+  btn.style.display = 'none';
+  $('#afterSubmit').style.display = '';
   toast('已送出，謝謝！');
 };
+// 關閉頁面最後搶救：若尚有未送達的資料，改用 sendBeacon 背景補送
+window.addEventListener('pagehide', () => {
+  if (!SUBMIT_URL || !navigator.sendBeacon) return;
+  const cur = store.get();
+  if (cur && cur.pendingSync && cur.payload) {
+    navigator.sendBeacon(SUBMIT_URL, new Blob([JSON.stringify(cur.payload)], { type: 'text/plain;charset=utf-8' }));
+  }
+});
 function restart(){ store.clear(); newResult(); $('#comment').value = ''; document.querySelectorAll('.opt.on').forEach(o => o.classList.remove('on')); $('#county').value = ''; checkProfile(); startStory(); }
 $('#restart').onclick = restart; $('#restart2').onclick = restart;
 
 /* ---------- 開始 ---------- */
+if (SUBMIT_URL) {
+  const protoEl = $('.proto');
+  if (protoEl) protoEl.textContent = '台灣聾人聯盟・你的回答已匿名加密傳送，僅供研究分析';
+}
 if (/[?&]debug/.test(location.search)) $('#debugBox').hidden = false; // 網址加 ?debug 才顯示資料
 newResult();
 const saved = store.get();
+// 若上次遇到斷網有留未同步草稿，開頁時背景自動補送
+if (SUBMIT_URL && saved && saved.pendingSync && saved.payload) {
+  postSurvey(saved.payload.stage || 'submitted', saved.payload).then(ok => {
+    if (ok) store.set(Object.assign({}, saved, { pendingSync: false }));
+  });
+}
 if (saved && saved.done) show('done'); else startStory();
 </script>
 </body>
