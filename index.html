@@ -4,6 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
+<!-- LINE／FB 分享預覽 -->
+<meta name="description" content="台灣聾人聯盟邀請你當評審：看看各縣市政見發表會的手語畫面，哪一個最容易看清楚？約 5 分鐘、不用打字。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="2026 政見會手語畫面評審｜台灣聾人聯盟">
+<meta property="og:description" content="台灣聾人聯盟邀請你當評審：看看各縣市政見發表會的手語畫面，哪一個最容易看清楚？約 5 分鐘、不用打字。">
+<meta property="og:url" content="https://robotren70123.github.io/tsl-screen-survey/">
+<meta property="og:image" content="https://robotren70123.github.io/tsl-screen-survey/img/share.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <title>2026 政見會手語畫面評審｜台灣聾人聯盟</title>
 <!-- 試作版：資料只存在這台裝置（localStorage），尚未連到 Google 試算表 -->
 <style>
@@ -83,8 +91,8 @@ h2{font-size:clamp(1.25rem,4.5vw,1.75rem);margin:0}
   box-shadow:0 2px 8px rgba(0,0,0,.3)}
 .zoom svg{width:26px;height:26px;display:block}
 .pick.win{outline-color:var(--good);transform:scale(1.02)}
-.pick.win::after{content:"✔";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:5rem;color:#fff;background:rgba(31,157,107,.35);animation:pop .35s ease}
+.pick.win::after{content:"";background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.8 4.8L19.5 7' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center;background-size:min(40%,110px);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:#fff;background-color:rgba(31,157,107,.35);animation:pop .35s ease}
 .pick.lose{opacity:.35;filter:grayscale(1)}
 @keyframes pop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
 .tie-row{display:flex;justify-content:center;gap:10px}
@@ -261,6 +269,7 @@ mark.tbd{background:#fff1a8;color:#6b4e00;border-radius:6px;padding:0 4px;font-w
 .steps{display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap;font-size:.85rem;font-weight:700;color:var(--sub);margin:0;padding:0;list-style:none}
 .steps li{display:flex;align-items:center;gap:4px}
 .steps li+li::before{content:"";width:14px;height:2px;background:var(--line);margin-right:2px}
+.steps b svg{width:1em;height:1em;display:block}
 .steps b{display:inline-flex;align-items:center;justify-content:center;width:1.6em;height:1.6em;border-radius:50%;background:var(--chip);font-size:.85em}
 .steps .done b{background:var(--ink);color:var(--bg)}
 .steps .now{color:var(--ink)} .steps .now b{background:var(--accent);color:var(--accent-ink)}
@@ -293,7 +302,7 @@ mark.tbd{background:#fff1a8;color:#6b4e00;border-radius:6px;padding:0 4px;font-w
 .lightbox img{max-width:100%;max-height:100%;object-fit:contain}
 .lb-tip{position:absolute;bottom:18px;left:0;right:0;text-align:center;color:#ddd;font-size:0.9375rem;margin:0}
 @media (orientation:landscape){ .lb-tip{display:none} }
-.lightbox .close{position:absolute;top:12px;right:12px;width:52px;height:52px;border-radius:50%;background:#fff;color:#111;font-size:1.625rem}
+.lightbox .close{display:flex;align-items:center;justify-content:center;position:absolute;top:12px;right:12px;width:52px;height:52px;border-radius:50%;background:#fff;color:#111;font-size:1.625rem}
 
 /* 結尾 */
 .top3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
@@ -564,7 +573,7 @@ pre{white-space:pre-wrap;word-break:break-all;font-size:0.75rem;max-height:300px
       <textarea id="comment" placeholder="例如：希望手語框再大一點……"></textarea></div>
     <div class="row center"><button class="big-btn" id="submitBtn">送出評審結果 <span class="ui-ic" data-ic="check"></span></button></div>
     <div class="row center" id="afterSubmit" style="display:none">
-      <span>✅ 評審結果已送出！操作上有什麼不順、看不懂的地方，請告訴邀請你的人</span></div>
+      <span class="ui-ic" data-ic="check" style="color:var(--good)"></span><span>評審結果已送出！操作上有什麼不順、看不懂的地方，請告訴邀請你的人</span></div>
     <div class="end-brand">
       <div class="brand" data-brand></div>
       <p class="motto">聾人事務，聾人參與<small>Nothing About Us Without Us.</small></p>
@@ -576,7 +585,7 @@ pre{white-space:pre-wrap;word-break:break-all;font-size:0.75rem;max-height:300px
   <!-- 已填過 -->
   <section class="screen center" id="s-done">
     <div class="brand" data-brand></div>
-    <h2>這台裝置已經完成評審了 🙏</h2>
+    <h2>這台裝置已經完成評審了</h2>
     <p class="sub">謝謝你的參與！</p>
     <p class="motto">聾人事務，聾人參與</p>
     <button class="ghost" id="restart2"><span class="ui-ic" data-ic="redo"></span>重來（測試用）</button>
@@ -585,7 +594,7 @@ pre{white-space:pre-wrap;word-break:break-all;font-size:0.75rem;max-height:300px
   <p class="proto">測試版・你的回答只存在這台裝置，不會上傳</p>
 </div>
 
-<div class="lightbox" id="lightbox"><img id="lbImg" alt="放大的畫面"><p class="lb-tip"><span class="ui-ic" data-ic="rotate"></span> 手機橫放可以看得更大</p><button class="close" id="lbClose" aria-label="關閉">✕</button></div>
+<div class="lightbox" id="lightbox"><img id="lbImg" alt="放大的畫面"><p class="lb-tip"><span class="ui-ic" data-ic="rotate"></span> 手機橫放可以看得更大</p><button class="close" id="lbClose" aria-label="關閉"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></button></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -683,7 +692,7 @@ const EVENT_NAME = '2026 政見會<br>手語畫面評審';
 document.querySelectorAll('[data-brand]').forEach(el => el.innerHTML =
   `<img class="b-mark" src="img/logo-mark.png" alt=""><img class="b-text" src="img/logo-text.png" alt="台灣聾人聯盟 Taiwanese Deaf Alliance"><span class="b-sep"></span><span class="b-title">${EVENT_NAME}</span>`);
 const STEPS = ['報到', '第一關 對決', '第二關 打分數', '完成'];
-function stepsHTML(now){ return STEPS.map((s, i) => `<li class="${i < now ? 'done' : i === now ? 'now' : ''}"><b>${i < now ? '✓' : i + 1}</b>${s}</li>`).join(''); }
+function stepsHTML(now){ return STEPS.map((s, i) => `<li class="${i < now ? 'done' : i === now ? 'now' : ''}"><b>${i < now ? UI_ICONS.check : i + 1}</b>${s}</li>`).join(''); }
 document.querySelectorAll('[data-steps]').forEach(el => el.innerHTML = stepsHTML(+el.dataset.steps));
 // 字級：預設跟著瀏覽器／手機的字型大小（rem），另外可以手動放大；記在這台裝置
 const FS = { m: '100%', l: '115%', xl: '130%' };
@@ -817,7 +826,7 @@ function runTutorial(){
     [0,    () => { t.textContent = '每一題會出現兩個畫面'; at($('#demo'), .5, .5); }],
     [1600, () => { t.textContent = '看哪一個比較容易看清楚手語'; at(B); }],
     [3000, () => { at(A); }],
-    [4200, () => { t.textContent = '點一下比較好的那一個 👍'; tap(); A.classList.add('win'); B.classList.add('lose'); }],
+    [4200, () => { t.textContent = '點一下比較好的那一個'; tap(); A.classList.add('win'); B.classList.add('lose'); }],
     [6200, () => { A.className = B.className = 'pick'; t.innerHTML = `看不清楚？按 <span class="ui-ic">${UI_ICONS.zoom}</span> 可以放大`; at(B, .9, .85); }],
     [7400, () => { tap(); }],
     [8800, () => { t.textContent = '兩個差不多，就按中間的「差不多」'; at($('#demoTie')); }],
@@ -836,12 +845,12 @@ function startPractice(){
   const d = $('#practiceDuel');
   const pc = (g, i) => `<button class="pick" data-good="${g}"><span class="tag">${'AB'[i]}</span>${fakeFrame(g, true)}</button>`;
   d.innerHTML = pc(goodLeft, 0) + `<button class="tie" id="practiceTie"><span class="ic">${UI_ICONS.balance}</span>差不多</button>` + pc(!goodLeft, 1);
-  $('#practiceTie').onclick = () => toast('再仔細比比看 👀');
+  $('#practiceTie').onclick = () => toast('再仔細比比看');
   d.querySelectorAll('.pick').forEach(b => b.onclick = () => {
     if (b.dataset.good === 'true'){
       b.classList.add('win'); d.querySelectorAll('.pick').forEach(o => o !== b && o.classList.add('lose'));
-      toast('答對了！正式開始 ✨'); setTimeout(startDuel, 900);
-    } else { toast('再看看另一個 👀'); }
+      toast('答對了！正式開始'); setTimeout(startDuel, 900);
+    } else { toast('再看看另一個'); }
   });
 }
 
@@ -859,7 +868,7 @@ $('#profileNext').onclick = () => stageIntro(1);
 function stageIntro(n){
   $('#stageSteps').innerHTML = stepsHTML(n);
   $('#stageNo').textContent = n === 1 ? '評審任務 1／2' : '評審任務 2／2';
-  $('#stageTitle').textContent = n === 1 ? '第一關　畫面對決 ⚔️' : '第二關　打分數 ⭐';
+  $('#stageTitle').textContent = n === 1 ? '第一關　畫面對決' : '第二關　打分數';
   $('#stageDesc').innerHTML = n === 1
     ? `共 ${N_PAIRS} 題，每題兩個縣市的畫面，選出<strong>比較容易看清楚手語</strong>的那個<br><span class="sub">先看怎麼玩，再練習一題</span>`
     : `第一關辛苦了！最後一關：共 ${N_RATE} 張，每張看手語清不清楚、有哪些問題<br><span class="sub">先看怎麼玩</span>`;
@@ -942,7 +951,7 @@ function vote(side){ // 'L' / 'R' / 'T'(差不多)
 function nextPair(){
   pi++;
   if (pi < N_PAIRS) { show('duel'); renderPair(); }
-  else { $('#duelBar').style.width = '100%'; stageIntro(2); toast('第一關完成！🎉'); }
+  else { $('#duelBar').style.width = '100%'; stageIntro(2); toast('第一關完成！'); }
 }
 document.addEventListener('keydown', e => {
   if (current !== 'duel' || $('#lightbox').classList.contains('on')) return;
@@ -1026,7 +1035,7 @@ function myTop3(){
   return Object.entries(s).sort((a, b) => score(b[1]) - score(a[1])).slice(0, 3).map(e => e[0]);
 }
 function finish(){
-  $('#myTop').innerHTML = myTop3().map((c, i) => `<figure><img src="${img(c)}" alt="第 ${i + 1} 名"><figcaption>${['🥇','🥈','🥉'][i]} 第 ${i + 1} 名</figcaption></figure>`).join('');
+  $('#myTop').innerHTML = myTop3().map((c, i) => `<figure><img src="${img(c)}" alt="第 ${i + 1} 名"><figcaption>第 ${i + 1} 名</figcaption></figure>`).join('');
   $('#json').textContent = JSON.stringify(R, null, 1);
   $('#afterSubmit').style.display = 'none'; $('#submitBtn').style.display = '';
   show('end');
