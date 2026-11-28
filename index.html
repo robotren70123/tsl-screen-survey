@@ -63,21 +63,19 @@ h2{font-size:clamp(1.25rem,4.5vw,1.75rem);margin:0}
 
 /* 對決 */
 .question{text-align:center;font-weight:700;font-size:clamp(1.125rem,4.2vw,1.5rem);margin:0}
-.duel{display:grid;grid-template-columns:1fr minmax(76px,4.75rem) 1fr;gap:12px;align-items:stretch}
-/* 「差不多」：電腦放兩張圖中間的直條，手機放兩張圖中間的橫條 */
-.duel .pick{align-self:center}
-.tie{border:3px dashed var(--line);border-radius:16px;background:var(--chip);font-weight:800;font-size:1.25rem;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transition:.12s;
-  writing-mode:vertical-rl;letter-spacing:.2em}
-.tie .ic{writing-mode:horizontal-tb;width:40px;height:40px;display:flex;align-items:center;justify-content:center;letter-spacing:0}
+/* 兩張圖並排；「差不多」是一顆橫的膠囊按鈕：電腦／平板橫放在兩張圖正下方，手機直放夾在兩張圖中間 */
+.duel{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px;align-items:center;width:100%;margin:0 auto;
+  max-width:max(560px, calc((100svh - 16rem) * 3.4))} /* 視窗矮時兩張圖一起縮小，「差不多」不會被擠到畫面外 */
+.tie{grid-column:1/-1;grid-row:2;justify-self:center;border:3px dashed var(--line);border-radius:999px;background:var(--chip);
+  font-weight:800;font-size:1.125rem;letter-spacing:.1em;display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  min-height:52px;padding:6px 30px;transition:.12s}
+.tie .ic{width:32px;height:32px;display:flex;align-items:center;justify-content:center;letter-spacing:0}
 .tie .ic svg{width:100%;height:100%;display:block}
 @media (hover:hover){ .tie:hover{border-color:var(--accent);border-style:solid} }
 .tie.on{background:var(--chip-on);border-color:var(--accent);border-style:solid}
 @media (orientation:portrait), (max-width:700px){
-  .duel{grid-template-columns:1fr;justify-items:center;gap:8px}
-  .duel .pick,.duel .tie{width:min(100%, 60vh)}
-  .tie{writing-mode:horizontal-tb;flex-direction:row;min-height:52px;letter-spacing:.1em;font-size:1.125rem}
-  .tie .ic{width:32px;height:32px}
+  .duel{grid-template-columns:1fr;justify-items:center;gap:8px;max-width:none}
+  .duel .pick{width:min(100%, 60vh)}
 }
 .pick{position:relative;border-radius:16px;overflow:hidden;background:#000;box-shadow:var(--shadow);
   outline:4px solid transparent;transition:transform .12s, outline-color .12s;aspect-ratio:16/9}
@@ -121,17 +119,26 @@ h2{font-size:clamp(1.25rem,4.5vw,1.75rem);margin:0}
 .step-label small{font-weight:500;color:var(--sub);font-size:0.875rem}
 .split .reason-thumb{max-width:none}
 @media (min-width:900px) and (orientation:landscape){
-  .split{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(320px,1fr);gap:22px;align-items:center}
-  .split .rate-img,.split .reason-thumb{width:100%;max-height:calc(100vh - 140px);object-fit:contain}
-  .panel{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:16px 18px}
+  .split{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(340px,1fr);gap:22px;align-items:start}
+  .split .rate-img,.split .reason-thumb{width:100%;max-height:calc(100svh - 140px);object-fit:contain}
+  .panel{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:14px 18px}
   .panel .faces{justify-content:space-between;gap:6px}
-  .panel .face{flex:1;height:68px;padding:4px 2px}
-  .panel .face svg{width:38px;height:38px}
-  .panel .chips{grid-template-columns:repeat(2,1fr);gap:8px}
-  .panel .chip{flex-direction:row;justify-content:flex-start;text-align:left;min-height:56px;padding:6px 10px;gap:10px;font-size:0.875rem}
-  .panel .chip .chip-ic{width:46px;height:46px}
+  .panel .face{flex:1;height:64px;padding:4px 2px}
+  .panel .face svg{width:36px;height:36px}
+  /* 問題選項：右欄夠寬就排 3～4 欄，減少列數，一般大小的視窗不用捲動 */
+  .panel .chips{grid-template-columns:repeat(auto-fill,minmax(9.5rem,1fr));gap:8px}
+  .panel .chip{flex-direction:row;justify-content:flex-start;text-align:left;min-height:50px;padding:5px 10px;gap:8px;font-size:0.875rem}
+  .panel .chip .chip-ic{width:38px;height:38px}
   .panel .chip[data-k="other"]{grid-column:1/-1;justify-content:center}
-  .panel .big-btn{align-self:stretch}
+  .panel .big-btn{align-self:stretch;position:sticky;bottom:10px} /* 字放大或視窗很矮時，按鈕仍看得到 */
+}
+/* 視窗很矮（瀏覽器沒開全螢幕、筆電）：再縮一點 */
+@media (min-width:900px) and (orientation:landscape) and (max-height:760px){
+  .panel{gap:6px;padding:10px 14px}
+  .panel .step-label{font-size:1rem;margin:0}
+  .panel .face{height:54px} .panel .face svg{width:30px;height:30px}
+  .panel .chip{min-height:42px} .panel .chip .chip-ic{width:30px;height:30px}
+  .panel .big-btn{min-height:46px;padding:8px 20px}
 }
 .rate-img img{width:100%;height:100%;object-fit:contain;display:block}
 .faces{display:flex;justify-content:center;gap:clamp(6px,2vw,12px)}
