@@ -271,7 +271,7 @@ mark.tbd{background:#fff1a8;color:#6b4e00;border-radius:6px;padding:0 4px;font-w
 .rule-tv *{transform-box:view-box}
 .rule-tv .hand{transform-box:fill-box;transform-origin:center;animation:signing 1.1s ease-in-out infinite}
 .rule-tv .hand.h2{animation-delay:-.55s}
-.rule-tv .rp{opacity:0;transition:opacity .8s ease}
+.rule-tv .rp{opacity:0;transition:opacity .4s ease} /* 淡入淡出 0.4 秒，清楚的 1 秒才看得到 */
 .rule-tv.blur .rb,.rule-tv.look .rl{opacity:1}
 .rule-tv .rl-frame{animation:ruleDash 1.2s linear infinite}
 @keyframes ruleDash{to{stroke-dashoffset:-30}}
@@ -1000,8 +1000,15 @@ function startRule(){ rri = 0; show('rule'); renderRule(); }
 function renderRule(){
   const s = RULE[rri], cap = $('#ruleCap'), tv = $('#ruleTv');
   clearTimeout(ruleT);
-  // 第一句：先看到清楚的畫面，再「霧化」，讓人看懂是後製模糊的
-  if (rri === 0) { tv.className = 'rule-tv'; ruleT = setTimeout(() => { if (current === 'rule' && rri === 0) tv.className = 'rule-tv blur'; }, 700); }
+  // 第一句：清楚 1 秒 → 霧化維持 5 秒 → 再清楚……一直循環，讓人看懂是後製模糊的（換句或離開本頁就停）
+  if (rri === 0) {
+    const loop = blur => {
+      if (current !== 'rule' || rri !== 0) return;
+      tv.className = blur ? 'rule-tv blur' : 'rule-tv';
+      ruleT = setTimeout(() => loop(!blur), blur ? 5000 : 1000);
+    };
+    loop(false);
+  }
   else tv.className = 'rule-tv ' + s.tv;
   cap.innerHTML = s.text; cap.classList.remove('in'); void cap.offsetWidth; cap.classList.add('in');
   $('#ruleDots').innerHTML = RULE.map((_, i) => `<i class="${i === rri ? 'on' : ''}"></i>`).join('');
