@@ -226,7 +226,7 @@ textarea{width:100%;min-height:90px}
 .tv .hand{transform-box:fill-box;transform-origin:center;animation:signing 1.1s ease-in-out infinite}
 .tv .hand.h2{animation-delay:-.55s}
 @keyframes signing{0%,100%{transform:translate(0,0)}50%{transform:translate(3px,-7px)}}
-.story-cap{min-height:4.6em;max-width:640px;text-align:center;font-weight:700;font-size:clamp(1.125rem,4.4vw,1.5rem);line-height:1.55;margin:0}
+.story-cap{min-height:4.6em;max-width:640px;text-wrap:balance;text-align:center;font-weight:700;font-size:clamp(1.125rem,4.4vw,1.5rem);line-height:1.55;margin:0}
 .story-cap.in{animation:fade .45s ease}
 .story-cap b{color:var(--accent)}
 /* 「你」：字幕出現後原地放大、跳幾下 */
@@ -627,16 +627,17 @@ const ISSUES = [ // 第一關原因、第二關問題共用同一組，方便分
 // tv：電視動畫狀態（on 開機、small 框小、dark 暗、messy 背景亂、q 問號、letter 公文、ok 中選會同意、third 1/3、cc 字幕條、two 換第二位手譯員、cert 乙級徽章、win 標語、judge 評審）
 const STORY = [
   // 依據：聯盟 115.9.10 台聾盟字第 1150001 號函、中選會 115.9.23 中選綜字第 1150001186 號復函
-  { tv: 'on', text: '從 111 年起，台灣聾人聯盟每次選舉都在檢視政見發表會的手語畫面，關心聾人的<b>資訊平權</b>。' },
-  { tv: 'on small dark messy q', text: '選舉時，聾人也想看電視政見發表會認識候選人，可是手語畫面常常<b>太小、太暗、背景太亂</b>……' },
-  { tv: 'on small dark messy letter', text: '今年 9 月，我們再次發公文給中央選舉委員會，提醒這幾件事：' },
+  // <br> 是分段的地方（照語意斷句，不讓最後一行只剩一兩個字）
+  { tv: 'on', text: '從 111 年起，台灣聾人聯盟每次選舉<br>都在檢視政見發表會的手語畫面，<br>關心聾人的<b>資訊平權</b>。' },
+  { tv: 'on small dark messy q', text: '選舉時，聾人也想看電視政見發表會認識候選人，<br>可是手語畫面常常<b>太小、太暗、背景太亂</b>……' },
+  { tv: 'on small dark messy letter', text: '今年 9 月，我們再次發公文給中央選舉委員會，<br>提醒這幾件事：' },
   { tv: 'on dark messy third', text: '① 手語畫面至少占電視畫面<b>三分之一</b>' },
-  { tv: 'on', text: '② 背景<b>乾淨</b>、燈光<b>充足</b>，手語畫面不要被其他資訊擋住' },
-  { tv: 'on two cert', text: '③ 優先聘用有<b>乙級證照</b>的手譯員，人力和費用要合理' },
+  { tv: 'on', text: '② 背景<b>乾淨</b>、燈光<b>充足</b>，<br>手語畫面不要被其他資訊擋住' },
+  { tv: 'on two cert', text: '③ 優先聘用有<b>乙級證照</b>的手譯員，<br>人力和費用要合理' },
   { tv: 'on two cc', text: '④ 手語翻譯之外，也推動<b>同步聽打字幕</b>' },
-  { tv: 'on two letter ok', text: '中選會回覆：前三項<b>原則同意</b>，已請各縣市選委會配合。同步聽打暫時做不到，先在重播和 YouTube 影片提供字幕。' },
-  { tv: 'on two win', text: '11 月 28 日選舉已經結束。各縣市有沒有做到？希望<b>一年比一年更好</b>！' },
-  { tv: 'on two judge', text: '這次換<b class="you">你</b>當評審：看看各縣市的手語畫面，哪一個最容易看清楚？',
+  { tv: 'on two letter ok', text: '中選會回覆：<b>前三項原則同意</b>，已請各縣市選委會配合。<br>同步聽打暫時做不到，先在重播和 YouTube 影片<b>提供字幕</b>。' },
+  { tv: 'on two win', text: '11 月 28 日選舉已經結束。<br>各縣市有沒有做到？希望<b>一年比一年更好</b>！' },
+  { tv: 'on two judge', text: '這次換<b class="you">你</b>當評審：<br>看看各縣市的手語畫面，哪一個最容易看清楚？',
     note: '大約 5 分鐘、不用打字・縣市名和臉都已模糊，只評畫面、不評翻譯<br>結果會公布在聯盟粉絲專頁，並函送中選會與各地選委會【待確認】・填寫截止：【待確認】' }];
 
 /* ---------- 溫暖手繪扁平風介面圖示（SVG） ---------- */
