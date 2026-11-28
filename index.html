@@ -263,6 +263,30 @@ mark.tbd{background:#fff1a8;color:#6b4e00;border-radius:6px;padding:0 4px;font-w
   .story-cap.in,.story-cap .you{animation:none}
 }
 
+/* 評審須知（只評畫面、不評翻譯）：跟開場故事同一套電視畫風 */
+.rule-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;flex:1;justify-content:center}
+.rule-title{margin:0}
+.rule-tv{width:100%;max-width:600px;max-width:min(600px, calc((100svh - 27rem) * 1.55));min-width:min(100%, 220px);cursor:pointer;display:block}
+.rule-tv svg{width:100%;height:auto;display:block;overflow:visible}
+.rule-tv *{transform-box:view-box}
+.rule-tv .hand{transform-box:fill-box;transform-origin:center;animation:signing 1.1s ease-in-out infinite}
+.rule-tv .hand.h2{animation-delay:-.55s}
+.rule-tv .rp{opacity:0;transition:opacity .8s ease}
+.rule-tv.blur .rb,.rule-tv.look .rl{opacity:1}
+.rule-tv .rl-frame{animation:ruleDash 1.2s linear infinite}
+@keyframes ruleDash{to{stroke-dashoffset:-30}}
+.rule-btns{position:sticky;bottom:8px;z-index:3}
+@media (orientation:landscape) and (max-height:520px){
+  .rule-wrap{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);column-gap:20px;row-gap:8px;
+    grid-template-areas:"tv title" "tv cap" "tv dots" "tv btn";align-content:center;align-items:center;justify-items:start}
+  .rule-title{grid-area:title}
+  .rule-tv{grid-area:tv;max-width:min(100%, calc((100svh - 110px) * 1.55));min-width:0;justify-self:center}
+  .rule-wrap .story-cap{grid-area:cap;min-height:0;text-align:left;font-size:1.0625rem}
+  .rule-wrap .dots{grid-area:dots}
+  .rule-btns{grid-area:btn}
+}
+@media (prefers-reduced-motion: reduce){ .rule-tv *{animation:none !important;transition:opacity .3s !important} }
+
 /* 主辦單位品牌列（台灣聾人聯盟 logo＋活動名稱） */
 .brand-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:10px;min-width:0}
@@ -507,7 +531,83 @@ pre{white-space:pre-wrap;word-break:break-all;font-size:0.75rem;max-height:300px
     <div class="card q"><label class="t">5. 你有看過 2026 年的公辦電視政見發表會嗎？</label>
       <div class="opts" data-q="watched">
         <button class="opt" data-v="有">有</button><button class="opt" data-v="沒有">沒有</button></div></div>
-    <div class="row center"><button class="big-btn" id="profileNext" disabled>報到完成，進入第一關 <span class="ui-ic" data-ic="play"></span></button></div>
+    <div class="row center"><button class="big-btn" id="profileNext" disabled>報到完成，下一步 <span class="ui-ic" data-ic="play"></span></button></div>
+  </section>
+
+  <!-- 3.5 評審須知：縣市名和臉都已模糊，只評畫面、不評翻譯（文字在 RULE 設定） -->
+  <section class="screen" id="s-rule">
+    <div class="brand-row"><div class="brand" data-brand></div></div>
+    <ol class="steps" data-steps="1"></ol>
+    <div class="rule-wrap">
+      <h2 class="rule-title">評審須知</h2>
+      <div class="rule-tv" id="ruleTv" role="button" tabindex="0" aria-label="下一句">
+        <svg viewBox="0 0 320 206" aria-hidden="true">
+          <defs>
+            <clipPath id="ruleScr"><rect x="20" y="14" width="280" height="158" rx="6"/></clipPath>
+            <clipPath id="ruleBox"><rect x="196" y="26" width="98" height="140" rx="8"/></clipPath>
+            <!-- 霧化效果：中間不透明、邊緣漸淡的橢圓（不用 CSS blur，LINE 內建瀏覽器也看得到） -->
+            <radialGradient id="ruleSkin"><stop offset="0" stop-color="#e9c9a8"/><stop offset=".62" stop-color="#e9c9a8" stop-opacity=".97"/><stop offset="1" stop-color="#e9c9a8" stop-opacity="0"/></radialGradient>
+            <radialGradient id="ruleBan"><stop offset="0" stop-color="#f3ead2"/><stop offset=".7" stop-color="#f3ead2" stop-opacity=".96"/><stop offset="1" stop-color="#f3ead2" stop-opacity="0"/></radialGradient>
+          </defs>
+          <rect x="138" y="190" width="44" height="9" rx="2" fill="#2b3a4a"/>
+          <rect x="108" y="198" width="104" height="6" rx="3" fill="#2b3a4a"/>
+          <rect x="8" y="3" width="304" height="190" rx="16" fill="#2b3a4a"/>
+          <circle cx="160" cy="182" r="3" fill="#e0602b"/>
+          <g clip-path="url(#ruleScr)">
+            <rect x="20" y="14" width="280" height="158" fill="#3b5b8c"/>
+            <rect x="20" y="132" width="280" height="40" fill="#34507c"/>
+            <!-- 縣市名稱直幅 -->
+            <rect x="30" y="22" width="26" height="118" rx="3" fill="#fdf6e3" stroke="#c9a55a" stroke-width="2"/>
+            <g font-size="13" font-weight="800" fill="#7a2f2f" text-anchor="middle">
+              <text x="43" y="42">○</text><text x="43" y="60">○</text><text x="43" y="78">縣</text><text x="43" y="96">長</text><text x="43" y="114">選</text><text x="43" y="132">舉</text></g>
+            <!-- 候選人與講台 -->
+            <circle cx="120" cy="74" r="14" fill="#e9c9a8"/>
+            <path d="M107 68c2-9 24-9 26 0" stroke="#2d3e50" stroke-width="6" stroke-linecap="round" fill="none"/>
+            <circle cx="115" cy="75" r="1.9" fill="#2b3a4a"/><circle cx="125" cy="75" r="1.9" fill="#2b3a4a"/>
+            <path d="M115 81c3 2 7 2 10 0" stroke="#2b3a4a" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+            <rect x="101" y="90" width="38" height="40" rx="10" fill="#2d3e50"/>
+            <path d="M120 90l-4 9 4 4 4-4z" fill="#e0602b"/>
+            <rect x="84" y="114" width="72" height="58" rx="4" fill="#c9d3e0"/>
+            <rect x="84" y="114" width="72" height="8" fill="#aebbcc"/>
+            <!-- 手語畫面 -->
+            <g clip-path="url(#ruleBox)">
+              <rect x="196" y="26" width="98" height="140" fill="#f2f6fa"/>
+              <circle cx="245" cy="70" r="15" fill="#e9c9a8"/>
+              <path d="M229 68c0-14 32-14 32 0v6c-4-6-28-6-32 0z" fill="#6b4a3a"/>
+              <circle cx="240" cy="72" r="1.9" fill="#2b3a4a"/><circle cx="250" cy="72" r="1.9" fill="#2b3a4a"/>
+              <path d="M240 78c3 2 7 2 10 0" stroke="#2b3a4a" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+              <rect x="223" y="88" width="44" height="80" rx="14" fill="#24445e"/>
+              <circle class="hand" cx="220" cy="106" r="8" fill="#e9c9a8"/>
+              <circle class="hand h2" cx="271" cy="100" r="8" fill="#e9c9a8"/>
+            </g>
+            <rect x="196" y="26" width="98" height="140" rx="8" fill="none" stroke="#ffffff" stroke-width="3"/>
+            <!-- ① 模糊處理：縣市名、兩張臉 -->
+            <g class="rp rb">
+              <ellipse cx="43" cy="81" rx="19" ry="68" fill="url(#ruleBan)"/>
+              <ellipse cx="120" cy="75" rx="20" ry="21" fill="url(#ruleSkin)"/>
+              <ellipse cx="245" cy="72" rx="21" ry="22" fill="url(#ruleSkin)"/>
+            </g>
+          </g>
+          <!-- ② 只看畫面（框起來＋打勾），不評翻譯（劃掉） -->
+          <g class="rp rl">
+            <rect class="rl-frame" x="190" y="20" width="110" height="152" rx="12" fill="none" stroke="#ffd36b" stroke-width="4" stroke-dasharray="9 6"/>
+            <circle cx="298" cy="24" r="15" fill="#1f9d6b" stroke="#ffffff" stroke-width="3"/>
+            <path d="M290 24l6 6 10-11" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="66" y="26" width="104" height="26" rx="13" fill="#ffffff" stroke="#2b3a4a" stroke-width="2"/>
+            <text x="124" y="44" text-anchor="middle" font-size="12" font-weight="900" fill="#5b6270">翻得好不好</text>
+            <path d="M88 39h72" stroke="#c94f4f" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="72" cy="39" r="11" fill="#c94f4f" stroke="#ffffff" stroke-width="2.5"/>
+            <path d="M67.5 34.5l9 9M76.5 34.5l-9 9" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round"/>
+          </g>
+        </svg>
+      </div>
+      <p class="story-cap" id="ruleCap" aria-live="polite"></p>
+      <div class="dots" id="ruleDots"></div>
+      <div class="row center rule-btns">
+        <button class="ghost" id="rulePrev">上一句</button>
+        <button class="big-btn" id="ruleNext">下一句 <span class="ui-ic" data-ic="play"></span></button>
+      </div>
+    </div>
   </section>
 
   <!-- 4. 關卡開場 -->
@@ -588,7 +688,7 @@ pre{white-space:pre-wrap;word-break:break-all;font-size:0.75rem;max-height:300px
       <h1>辛苦了，評審！</h1>
       <p class="lead">兩關都完成了。你的評審結果會整理成報告，幫聯盟爭取讓聾人看得清楚的手語畫面。</p>
     </div>
-    <div class="card" hidden><!-- 前三名先不顯示（要恢復就拿掉 hidden） --><h2>你評出的前三名</h2>
+    <div class="card"><h2>你評出的前三名</h2>
       <p class="sub" style="margin-top:4px">依你剛剛的選擇和分數推算，只是參考</p>
       <div class="top3" id="myTop"></div></div>
     <div class="card q"><label class="t" for="comment">還有想跟聯盟說的嗎？（可不填）</label>
@@ -626,7 +726,7 @@ pre{white-space:pre-wrap;word-break:break-all;font-size:0.75rem;max-height:300px
 const IMAGES = ['q01','q11','q14','q15','q16','q29','q31','q37','q41','q54','q57','q63','q65','q66','q71','q72','q74','q76','q77','q79','q80','q83'];
 const N_PAIRS = 15;     // 第一關對決組數
 const REASON_EVERY = 0; // 每幾組問一次落選原因；0 = 不問（第二關已經有問題複選，避免重複）
-const N_RATE = 5;       // 第二關評分張數
+const N_RATE = 6;       // 第二關評分張數（2026-11-29 由 5 改 6）
 const STORE_KEY = 'tslSurvey2026_proto';
 // 正式收資料網址（Google Apps Script 部署後的 /exec 網址；留空＝試作模式，只存這台裝置不送出）
 const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbzB_CyoxazxMJi1jeAYjXpFjplltNyb266vY52YEXvA-tPxvxY1c967G15GEx9kqYWN/exec';
@@ -650,7 +750,7 @@ const STORY = [
   { tv: 'on two letter ok', text: '中選會回覆：<b>前三項原則同意</b>，<wbr>已請各縣市選委會配合。<br>同步聽打暫時做不到，先在重播和 YouTube 影片<wbr><b>提供字幕</b>。' },
   { tv: 'on two win', text: '11 月 28 日選舉已經結束。<br>各縣市有沒有做到？<wbr>希望<b>一年比一年更好</b>！' },
   { tv: 'on two judge', text: '這次換<b class="you">你</b>當評審：<br>看看各縣市的手語畫面，<wbr>哪一個最容易看清楚？',
-    note: '大約 5 分鐘、不用打字・縣市名和臉都已模糊，只評畫面、不評翻譯<br>結果會公布在聯盟粉絲專頁，並函送中選會與各地選委會【待確認】・<span style="white-space:nowrap">填寫截止：【待確認】</span>' }];
+    note: '大約 5 分鐘、不用打字<br>結果會公布在聯盟粉絲專頁，並函送中選會與各地選委會【待確認】・<span style="white-space:nowrap">填寫截止：【待確認】</span>' }];
 
 /* ---------- 溫暖手繪扁平風介面圖示（SVG） ---------- */
 const UI_ICONS = {
@@ -856,7 +956,7 @@ function makePairs(){
 /* ---------- 結果資料（正式版把這包 POST 到 Apps Script） ---------- */
 let R;
 function newResult(){
-  R = { session: uid(), version: 'v1-2026-11-28', started: new Date().toISOString(),
+  R = { session: uid(), version: 'v2-2026-11-29', started: new Date().toISOString(),
         device: matchMedia('(hover:none)').matches ? 'touch' : 'mouse', screen: `${screen.width}x${screen.height}`,
         profile: {}, pairs: [], reasons: [], ratings: [], comment: '', finished: null };
 }
@@ -884,10 +984,35 @@ $('#storyPrev').onclick = storyPrev;
 $('#tv').onclick = storyNext;
 $('#skipStory').onclick = endStory;
 document.addEventListener('keydown', e => {
-  if (current !== 'story' || e.target.closest('button')) return; // 按鈕本身的 Enter／空白鍵交給 click
-  if (['ArrowRight', 'Enter', ' '].includes(e.key)) { e.preventDefault(); storyNext(); }
-  else if (e.key === 'ArrowLeft') storyPrev();
+  if (!['story', 'rule'].includes(current) || e.target.closest('button')) return; // 按鈕本身的 Enter／空白鍵交給 click
+  const next = current === 'story' ? storyNext : ruleNext, prev = current === 'story' ? storyPrev : rulePrev;
+  if (['ArrowRight', 'Enter', ' '].includes(e.key)) { e.preventDefault(); next(); }
+  else if (e.key === 'ArrowLeft') prev();
 });
+
+/* ---------- 3.5 評審須知：縣市名和臉都已模糊，只評畫面、不評翻譯（點一下換下一句） ---------- */
+// tv：blur 模糊處理、look 只看畫面（框起手語畫面、翻譯打叉）
+const RULE = [
+  { tv: 'blur', text: '畫面上的<b>縣市名稱</b>和<b>人臉</b>，<wbr>都已經模糊處理。' },
+  { tv: 'blur look', text: '請<b>只評畫面</b>：<wbr>手語框大小、燈光、背景……<br><b>不評翻譯</b>，<wbr>不用管手譯員翻得好不好。' }];
+let rri = 0, ruleT;
+function startRule(){ rri = 0; show('rule'); renderRule(); }
+function renderRule(){
+  const s = RULE[rri], cap = $('#ruleCap'), tv = $('#ruleTv');
+  clearTimeout(ruleT);
+  // 第一句：先看到清楚的畫面，再「霧化」，讓人看懂是後製模糊的
+  if (rri === 0) { tv.className = 'rule-tv'; ruleT = setTimeout(() => { if (current === 'rule' && rri === 0) tv.className = 'rule-tv blur'; }, 700); }
+  else tv.className = 'rule-tv ' + s.tv;
+  cap.innerHTML = s.text; cap.classList.remove('in'); void cap.offsetWidth; cap.classList.add('in');
+  $('#ruleDots').innerHTML = RULE.map((_, i) => `<i class="${i === rri ? 'on' : ''}"></i>`).join('');
+  $('#rulePrev').style.visibility = rri ? 'visible' : 'hidden';
+  $('#ruleNext').innerHTML = rri === RULE.length - 1 ? `開始第一關 <span class="ui-ic">${UI_ICONS.play}</span>` : `下一句 <span class="ui-ic">${UI_ICONS.play}</span>`;
+}
+function ruleNext(){ if (rri < RULE.length - 1) { rri++; renderRule(); } else { clearTimeout(ruleT); stageIntro(1); } }
+function rulePrev(){ if (rri > 0) { rri--; renderRule(); } }
+$('#ruleNext').onclick = ruleNext;
+$('#rulePrev').onclick = rulePrev;
+$('#ruleTv').onclick = ruleNext;
 
 /* ---------- 1. 動畫教學（假畫面，不是真的題目） ---------- */
 // 用簡單圖形畫兩個「示範畫面」：A 手語框大又亮、B 手語框小又暗
@@ -963,7 +1088,7 @@ document.querySelectorAll('.opts').forEach(g => g.querySelectorAll('.opt').forEa
 }));
 $('#county').onchange = e => { R.profile.county = e.target.value; checkProfile(); };
 function checkProfile(){ $('#profileNext').disabled = !['identity','gender','age','county','watched'].every(k => R.profile[k]); }
-$('#profileNext').onclick = () => stageIntro(1);
+$('#profileNext').onclick = startRule; // 報到 → 評審須知（只評畫面）→ 第一關說明
 
 /* ---------- 4. 關卡開場 ---------- */
 function stageIntro(n){
