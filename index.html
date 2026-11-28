@@ -226,7 +226,7 @@ textarea{width:100%;min-height:90px}
 .tv .hand{transform-box:fill-box;transform-origin:center;animation:signing 1.1s ease-in-out infinite}
 .tv .hand.h2{animation-delay:-.55s}
 @keyframes signing{0%,100%{transform:translate(0,0)}50%{transform:translate(3px,-7px)}}
-.story-cap{min-height:4.6em;max-width:640px;text-wrap:balance;text-align:center;font-weight:700;font-size:clamp(1.125rem,4.4vw,1.5rem);line-height:1.55;margin:0}
+.story-cap{min-height:4.6em;max-width:640px;text-wrap:balance;word-break:keep-all;overflow-wrap:anywhere;text-align:center;font-weight:700;font-size:clamp(1.125rem,4.4vw,1.5rem);line-height:1.55;margin:0}
 .story-cap.in{animation:fade .45s ease}
 .story-cap b{color:var(--accent)}
 /* 「你」：字幕出現後原地放大、跳幾下 */
@@ -234,7 +234,7 @@ textarea{width:100%;min-height:90px}
 @keyframes youPop{0%{transform:scale(1)}45%{transform:scale(1.7) rotate(-8deg)}100%{transform:scale(1.15)}}
 @keyframes youBounce{0%,100%{transform:scale(1.15) translateY(0)}50%{transform:scale(1.3) translateY(-8px)}}
 .story-wrap > .row{position:sticky;bottom:8px;z-index:3} /* 字放很大時，按鈕仍固定看得到 */
-.story-note{max-width:640px;text-align:center;font-size:0.875rem;color:var(--sub);margin:-6px 0 0}
+.story-note{max-width:640px;word-break:keep-all;overflow-wrap:anywhere;text-align:center;font-size:0.875rem;color:var(--sub);margin:-6px 0 0}
 mark.tbd{background:#fff1a8;color:#6b4e00;border-radius:6px;padding:0 4px;font-weight:700;font-size:.8em}
 .dots{display:flex;gap:6px}
 .dots i{width:9px;height:9px;border-radius:50%;background:var(--line);transition:.2s}
@@ -430,9 +430,12 @@ pre{white-space:pre-wrap;word-break:break-all;font-size:0.75rem;max-height:300px
           </g>
           <!-- 換你當評審：放大鏡 -->
           <g class="pop mag">
-            <circle cx="236" cy="92" r="30" fill="rgba(255,255,255,.18)" stroke="#ffffff" stroke-width="6"/>
-            <path d="M257 113l18 18" stroke="#ffffff" stroke-width="9" stroke-linecap="round"/>
-            <path d="M257 113l18 18" stroke="#e0602b" stroke-width="4" stroke-linecap="round"/>
+            <!-- 深色外框＋黃色內圈，放在白色手語框上也看得清楚 -->
+            <path d="M258 114l20 20" stroke="#2b3a4a" stroke-width="13" stroke-linecap="round"/>
+            <path d="M258 114l20 20" stroke="#e0602b" stroke-width="6" stroke-linecap="round"/>
+            <circle cx="236" cy="92" r="30" fill="rgba(255,211,107,.22)" stroke="#2b3a4a" stroke-width="7"/>
+            <circle cx="236" cy="92" r="25.5" fill="none" stroke="#ffd36b" stroke-width="2.5"/>
+            <path d="M220 80a18 18 0 0 1 12-6" stroke="#ffffff" stroke-width="3" stroke-linecap="round" fill="none"/>
             <rect x="30" y="24" width="96" height="30" rx="15" fill="#1f9d6b" stroke="#ffffff" stroke-width="2.5"/>
             <text x="78" y="44" text-anchor="middle" font-size="13" font-weight="900" fill="#ffffff">你是評審</text>
           </g>
@@ -627,18 +630,18 @@ const ISSUES = [ // 第一關原因、第二關問題共用同一組，方便分
 // tv：電視動畫狀態（on 開機、small 框小、dark 暗、messy 背景亂、q 問號、letter 公文、ok 中選會同意、third 1/3、cc 字幕條、two 換第二位手譯員、cert 乙級徽章、win 標語、judge 評審）
 const STORY = [
   // 依據：聯盟 115.9.10 台聾盟字第 1150001 號函、中選會 115.9.23 中選綜字第 1150001186 號復函
-  // <br> 是分段的地方（照語意斷句，不讓最後一行只剩一兩個字）
-  { tv: 'on', text: '從 111 年起，台灣聾人聯盟每次選舉<br>都在檢視政見發表會的手語畫面，<br>關心聾人的<b>資訊平權</b>。' },
-  { tv: 'on small dark messy q', text: '選舉時，聾人也想看電視政見發表會認識候選人，<br>可是手語畫面常常<b>太小、太暗、背景太亂</b>……' },
-  { tv: 'on small dark messy letter', text: '今年 9 月，我們再次發公文給中央選舉委員會，<br>提醒這幾件事：' },
-  { tv: 'on dark messy third', text: '① 手語畫面至少占電視畫面<b>三分之一</b>' },
-  { tv: 'on', text: '② 背景<b>乾淨</b>、燈光<b>充足</b>，<br>手語畫面不要被其他資訊擋住' },
-  { tv: 'on two cert', text: '③ 優先聘用有<b>乙級證照</b>的手譯員，<br>人力和費用要合理' },
-  { tv: 'on two cc', text: '④ 手語翻譯之外，也推動<b>同步聽打字幕</b>' },
-  { tv: 'on two letter ok', text: '中選會回覆：<b>前三項原則同意</b>，已請各縣市選委會配合。<br>同步聽打暫時做不到，先在重播和 YouTube 影片<b>提供字幕</b>。' },
-  { tv: 'on two win', text: '11 月 28 日選舉已經結束。<br>各縣市有沒有做到？希望<b>一年比一年更好</b>！' },
-  { tv: 'on two judge', text: '這次換<b class="you">你</b>當評審：<br>看看各縣市的手語畫面，哪一個最容易看清楚？',
-    note: '大約 5 分鐘、不用打字・縣市名和臉都已模糊，只評畫面、不評翻譯<br>結果會公布在聯盟粉絲專頁，並函送中選會與各地選委會【待確認】・填寫截止：【待確認】' }];
+  // <br> 一定換行；<wbr> 是「需要時可以在這裡換行」。字幕設定成只在標點、空格、<wbr> 換行，不會把詞拆開（例如「同／意」、「清／楚」）
+  { tv: 'on', text: '從 111 年起，台灣聾人聯盟<wbr>每次選舉<br>都在檢視<wbr>政見發表會的手語畫面，<br>關心聾人的<b>資訊平權</b>。' },
+  { tv: 'on small dark messy q', text: '選舉時，聾人也想看電視政見發表會<wbr>認識候選人，<br>可是手語畫面常常<wbr><b>太小、太暗、背景太亂</b>……' },
+  { tv: 'on small dark messy letter', text: '今年 9 月，我們再次發公文<wbr>給中央選舉委員會，<br>提醒這幾件事：' },
+  { tv: 'on dark messy third', text: '① 手語畫面<wbr>至少占電視畫面<wbr><b>三分之一</b>' },
+  { tv: 'on', text: '② 背景<b>乾淨</b>、燈光<b>充足</b>，<br>手語畫面<wbr>不要被其他資訊擋住' },
+  { tv: 'on two cert', text: '③ 優先聘用<wbr>有<b>乙級證照</b>的手譯員，<br>人力和費用要合理' },
+  { tv: 'on two cc', text: '④ 手語翻譯之外，<wbr>也推動<b>同步聽打字幕</b>' },
+  { tv: 'on two letter ok', text: '中選會回覆：<b>前三項原則同意</b>，<wbr>已請各縣市選委會配合。<br>同步聽打暫時做不到，先在重播和 YouTube 影片<wbr><b>提供字幕</b>。' },
+  { tv: 'on two win', text: '11 月 28 日選舉已經結束。<br>各縣市有沒有做到？<wbr>希望<b>一年比一年更好</b>！' },
+  { tv: 'on two judge', text: '這次換<b class="you">你</b>當評審：<br>看看各縣市的手語畫面，<wbr>哪一個最容易看清楚？',
+    note: '大約 5 分鐘、不用打字・縣市名和臉都已模糊，只評畫面、不評翻譯<br>結果會公布在聯盟粉絲專頁，並函送中選會與各地選委會【待確認】・<span style="white-space:nowrap">填寫截止：【待確認】</span>' }];
 
 /* ---------- 溫暖手繪扁平風介面圖示（SVG） ---------- */
 const UI_ICONS = {
