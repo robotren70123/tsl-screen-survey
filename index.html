@@ -105,6 +105,13 @@ h2{font-size:clamp(1.25rem,4.5vw,1.75rem);margin:0}
   border:3px solid transparent;transition:.12s}
 .chip .chip-ic{width:64px;height:64px;object-fit:contain;display:block;flex:none}
 .chip.on{background:var(--chip-on);border-color:var(--accent)}
+/* 向量圖示：選取時外框變橘色；深色背景時外框調亮 */
+.chip .chip-ic svg{width:100%;height:100%;display:block}
+.chip .vf{transition:stroke .15s}
+.chip.on .vf{stroke:var(--accent)}
+.demo2 .chip:not(.on) .vf{stroke:#c9d3e0}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .chip:not(.on) .vf{stroke:#c9d3e0} }
+.chip:focus{outline:none} .chip:focus-visible{outline:3px solid var(--accent);outline-offset:2px} /* 滑鼠點過不留黑框，鍵盤操作才顯示 */
 .other-txt{width:100%;margin-top:8px;padding:10px 12px;font-size:1rem;border-radius:12px;border:2px solid var(--accent);background:var(--card,transparent);color:inherit}
 @media (max-width:600px){ .chips{grid-template-columns:repeat(3,1fr);gap:8px} .chip{min-height:92px;font-size:0.8125rem;padding:8px 4px;gap:5px} .chip .chip-ic{width:54px;height:54px} }
 .reason-thumb{width:100%;max-width:420px;border-radius:12px;align-self:center;filter:grayscale(.3)}
@@ -126,10 +133,10 @@ h2{font-size:clamp(1.25rem,4.5vw,1.75rem);margin:0}
   .panel .face{flex:1;height:64px;padding:4px 2px}
   .panel .face svg{width:36px;height:36px}
   /* 問題選項：右欄夠寬就排 3～4 欄，減少列數，一般大小的視窗不用捲動 */
-  .panel .chips{grid-template-columns:repeat(auto-fill,minmax(9.5rem,1fr));gap:8px}
-  .panel .chip{flex-direction:row;justify-content:flex-start;text-align:left;min-height:50px;padding:5px 10px;gap:8px;font-size:0.875rem}
-  .panel .chip .chip-ic{width:38px;height:38px}
-  .panel .chip[data-k="other"]{grid-column:1/-1;justify-content:center}
+  /* 問題選項：跟手機一樣 3×3「圖在上、字在下」，插圖放大成主角，列數也從 5 列減為 3 列 */
+  .panel .chips{grid-template-columns:repeat(3,1fr);gap:8px}
+  .panel .chip{flex-direction:column;justify-content:center;text-align:center;min-height:0;padding:8px 6px;gap:4px;font-size:0.875rem;line-height:1.25}
+  .panel .chip .chip-ic{width:clamp(44px,4.4vw,68px);height:clamp(44px,4.4vw,68px)}
   .panel .big-btn{align-self:stretch;position:sticky;bottom:10px} /* 字放大或視窗很矮時，按鈕仍看得到 */
 }
 /* 視窗很矮（瀏覽器沒開全螢幕、筆電）：再縮一點 */
@@ -137,7 +144,7 @@ h2{font-size:clamp(1.25rem,4.5vw,1.75rem);margin:0}
   .panel{gap:6px;padding:10px 14px}
   .panel .step-label{font-size:1rem;margin:0}
   .panel .face{height:54px} .panel .face svg{width:30px;height:30px}
-  .panel .chip{min-height:42px} .panel .chip .chip-ic{width:30px;height:30px}
+  .panel .chip{padding:6px 4px;gap:2px} .panel .chip .chip-ic{width:clamp(40px,3.6vw,54px);height:clamp(40px,3.6vw,54px)}
   .panel .big-btn{min-height:46px;padding:8px 20px}
 }
 .rate-img img{width:100%;height:100%;object-fit:contain;display:block}
@@ -735,8 +742,53 @@ const FACES = [
   [`<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="19" fill="#ffe27a" stroke="#2b3a4a" stroke-width="2.8"/><circle cx="17.5" cy="21" r="2.4" fill="#2b3a4a"/><circle cx="30.5" cy="21" r="2.4" fill="#2b3a4a"/><path d="M17.5 30c2 3 11 3 13 0" stroke="#2b3a4a" stroke-width="2.8" stroke-linecap="round"/></svg>`,'不錯'],
   [`<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="19" fill="#ffc72c" stroke="#2b3a4a" stroke-width="2.8"/><path d="M14.5 21.5c1.5-2.5 4.5-2.5 6 0M27.5 21.5c1.5-2.5 4.5-2.5 6 0" stroke="#2b3a4a" stroke-width="2.6" stroke-linecap="round"/><path d="M16 29c2.5 5 13.5 5 16 0" fill="#ffffff" stroke="#2b3a4a" stroke-width="2.6" stroke-linejoin="round"/></svg>`,'很好']
 ];
-// 預先載入 9 張問題插畫圖示，避免切換畫面時閃爍
-ISSUES.forEach(([k]) => { const i = new Image(); i.src = `img/icons/issue-${k}.webp`; });
+/* ---------- 9 個問題選項圖示 ----------
+   'vector'：向量圖（目前使用，線條風格跟其他圖示一致、選取時外框變橘色、深色模式自動調亮）
+   'img'   ：改回插畫圖（img/icons/issue-*.webp，AI 生成＋後製，檔案保留在本機備用）
+   要改回插畫：把下一行改成 'img'，並確認 img/icons/ 的 9 張 webp 有一起上傳 */
+const ISSUE_ICON_STYLE = 'vector';
+const ISSUE_SVG = (() => {
+  const K = '#2b3a4a', SKIN = '#f5c8a4', SKY = '#e4eff7', BLUE = '#6f96b8', ORG = '#e0602b';
+  const tv = (inner, fill = SKY) => `<rect class="vf" x="3" y="6" width="42" height="31" rx="5" fill="${fill}" stroke="${K}" stroke-width="2.8"/>${inner}
+    <path class="vf" d="M18 42h12" stroke="${K}" stroke-width="2.8" stroke-linecap="round"/>`;
+  const signer = (x, y, s = 1, body = '#33475e', hand = SKIN) => `<g transform="translate(${x} ${y}) scale(${s})">
+    <path d="M-7 15c0-5 3-8 7-8s7 3 7 8v6h-14z" fill="${body}"/>
+    <circle cx="0" cy="0" r="4.6" fill="${SKIN}" stroke="${K}" stroke-width="1.6"/>
+    <circle cx="-8" cy="10" r="2.6" fill="${hand}" stroke="${K}" stroke-width="1.4"/><circle cx="8" cy="8" r="2.6" fill="${hand}" stroke="${K}" stroke-width="1.4"/></g>`;
+  return {
+    small: () => tv(`<rect x="33" y="26" width="9" height="8" rx="1.5" fill="#fff" stroke="${ORG}" stroke-width="2"/>${signer(37.5, 28.6, .32)}
+      <path d="M24 16l6 6M30 22v-4.5M30 22h-4.5" stroke="${ORG}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`),
+    cover: () => tv(`<rect x="22" y="9" width="20" height="25" rx="2" fill="#fff"/>${signer(32, 15, .8)}
+      <rect x="5" y="27" width="38" height="7.5" rx="1.5" fill="${K}"/><path d="M8 30.8h18" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+      <rect x="30" y="25" width="12" height="8" rx="1.5" fill="#111" stroke="${ORG}" stroke-width="1.4"/><path d="M33 29h6" stroke="${ORG}" stroke-width="2.2" stroke-linecap="round"/>`),
+    dist: () => tv(`<path d="M24 8v28" stroke="${K}" stroke-width="2" stroke-dasharray="2.5 2.5"/>${signer(13.5, 22, .5)}
+      <circle cx="34" cy="18" r="9" fill="${SKIN}" stroke="${K}" stroke-width="2"/><path d="M25 36c0-6 4-9 9-9s9 3 9 9" fill="#33475e"/>
+      <circle cx="31" cy="17" r="1.3" fill="${K}"/><circle cx="37" cy="17" r="1.3" fill="${K}"/>`),
+    dark: () => tv(`${signer(24, 17, 1.05, '#1c2530', '#6b5b52')}
+      <path d="M40 11.5a4 4 0 1 1-4.6-3.8a3.2 3.2 0 0 0 4.6 3.8z" fill="#ffd36b"/>`, '#3a4554'),
+    messy: () => tv(`<rect x="5.5" y="8.5" width="37" height="26" rx="3" fill="#f6dcc3"/>
+      <path d="M6 14l7-5 6 6 6-6 6 6 6-6 5 4" stroke="${ORG}" stroke-width="2" fill="none" stroke-linejoin="round"/>
+      <circle cx="10" cy="26" r="3" fill="#7aa36b"/><circle cx="39" cy="27" r="3.2" fill="${BLUE}"/><rect x="34" y="17" width="6" height="5" rx="1" fill="#c94f4f"/>
+      <path d="M8 20h5M37 31h5" stroke="#b8865a" stroke-width="2" stroke-linecap="round"/>${signer(24, 17, 1)}`),
+    contrast: () => tv(`${signer(24, 17, 1.05, '#d9a07c', '#d9a07c')}
+      <g transform="translate(24 17) scale(1.05)"><path d="M-7 15c0-5 3-8 7-8s7 3 7 8v6h-14z" fill="none" stroke="#9a6545" stroke-width="1.3" stroke-dasharray="2 1.6"/></g>
+      <path d="M36 11l3 3M39 11l-3 3" stroke="${ORG}" stroke-width="2" stroke-linecap="round"/>`, '#e3b291'),
+    shape: () => tv(`<ellipse cx="24" cy="21.5" rx="8.5" ry="13" fill="#fff" stroke="${ORG}" stroke-width="2.2"/>${signer(24, 16, .95)}
+      <path d="M13 26l2 2M35 24l-2 2" stroke="${ORG}" stroke-width="2.2" stroke-linecap="round"/>`),
+    blur: id => tv(`<defs><filter id="${id}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.6"/></filter></defs>
+      <g filter="url(#${id})">${signer(24, 17, 1.05)}</g>
+      <path d="M37 11c2 0 2 2 4 2M37 15c2 0 2 2 4 2" stroke="${BLUE}" stroke-width="1.8" stroke-linecap="round" fill="none"/>`),
+    other: () => `<path class="vf" d="M8 9h32a5 5 0 0 1 5 5v15a5 5 0 0 1-5 5H22l-8 6v-6H8a5 5 0 0 1-5-5V14a5 5 0 0 1 5-5z" fill="#fff" stroke="${K}" stroke-width="2.8" stroke-linejoin="round"/>
+      <circle cx="16" cy="21.5" r="2.6" fill="${ORG}"/><circle cx="24" cy="21.5" r="2.6" fill="${ORG}"/><circle cx="32" cy="21.5" r="2.6" fill="${ORG}"/>`
+  };
+})();
+let issueIconN = 0; // 模糊濾鏡每次給不同 id，避免同一頁有多組選項時互相干擾
+function issueIcon(k){
+  if (ISSUE_ICON_STYLE === 'img') return `<img class="chip-ic" src="img/icons/issue-${k}.webp" alt="" draggable="false">`;
+  return `<span class="chip-ic"><svg viewBox="0 0 48 48" fill="none" aria-hidden="true">${ISSUE_SVG[k]('ib' + (++issueIconN))}</svg></span>`;
+}
+// 用插畫圖時：預先載入 9 張，避免切換畫面時閃爍
+if (ISSUE_ICON_STYLE === 'img') ISSUES.forEach(([k]) => { const i = new Image(); i.src = `img/icons/issue-${k}.webp`; });
 
 /* ---------- 小工具 ---------- */
 const $ = s => document.querySelector(s);
@@ -904,7 +956,7 @@ function runTutorial2(){
   $('#demo2Img').innerHTML = fakeFrame(false) + `<span class="zoom">${UI_ICONS.zoom}</span>`;
   $('#demo2Faces').innerHTML = FACES.map(([f, l], i) => `<span class="face">${f}<small>${i + 1} ${l}</small></span>`).join('');
   $('#demo2Chips').innerHTML = ISSUES.filter(([k]) => ['small', 'dark', 'messy'].includes(k))
-    .map(([k, l]) => `<span class="chip" data-k="${k}"><img class="chip-ic" src="img/icons/issue-${k}.webp" alt="">${l}</span>`).join('');
+    .map(([k, l]) => `<span class="chip" data-k="${k}">${issueIcon(k)}${l}</span>`).join('');
   nx.classList.remove('ready', 'press');
   const at = (el, dx = .5, dy = .5) => { // 不自動捲動：循環播放時不要把使用者拉回去
     const r = el.getBoundingClientRect(), d = box.getBoundingClientRect();
@@ -978,7 +1030,7 @@ document.addEventListener('keydown', e => {
 document.addEventListener('keydown', e => { if (e.key === 'Escape') $('#lightbox').classList.remove('on'); });
 
 /* ---------- 6. 落選原因 ---------- */
-function chipHTML(){ return ISSUES.map(([k, t]) => `<button class="chip" data-k="${k}"><img class="chip-ic" src="img/icons/issue-${k}.webp" alt="" draggable="false">${t}</button>`).join(''); }
+function chipHTML(){ return ISSUES.map(([k, t]) => `<button class="chip" data-k="${k}">${issueIcon(k)}${t}</button>`).join(''); }
 function bindChips(box, onChange){
   box.innerHTML = chipHTML();
   // 選了「其他」才出現的一行輸入框
